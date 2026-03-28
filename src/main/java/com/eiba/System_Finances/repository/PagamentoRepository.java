@@ -11,5 +11,7 @@ public interface PagamentoRepository extends MongoRepository<Pagamento, String> 
 
     List<Pagamento> findByAlunoId(String alunoId);
     List<Pagamento> findByAlunoIdAndPago(String alunoId, boolean pago);
+    List<Pagamento> findByPagoFalse();
+    boolean existsByAlunoIdAndMes(String alunoId, String mes);
 
 }

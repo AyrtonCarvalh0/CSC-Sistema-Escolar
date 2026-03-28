@@ -1,6 +1,5 @@
 package com.eiba.System_Finances.entity;
 
-import com.eiba.System_Finances.entity.Aluno;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "pagamento")
@@ -9,13 +8,23 @@ public class Pagamento {
     private String id;
     private String alunoId;
     private String mes;
+    private Double valor;
     private boolean pago;
 
-    public Pagamento(String id, String alunoId, String mes, boolean pago) {
+    public Pagamento(String id, String alunoId, String mes, Double valor, boolean pago) {
         this.id = id;
         this.alunoId = alunoId;
         this.mes = mes;
+        this.valor = valor;
         this.pago = pago;
+    }
+
+    public Double getValor() {
+        return valor;
+    }
+
+    public void setValor(Double valor) {
+        this.valor = valor;
     }
 
     public String getId() {

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static java.lang.Long.sum;
+
 @Service
 public class AlunoService {
 
@@ -76,16 +78,26 @@ public class AlunoService {
         // 2. Busca os dados do responsável usando o ID que está no aluno
         Responsavel resp = responsavel.findById(aluno.getResponsavelId())
                 .orElseThrow(() -> new RuntimeException("Responsável não encontrado"));
-        
+
         // 3. Busca todos os pagamentos atrelados a esse aluno (usando o ID do Aluno, não do pai/mãe)
         List<Pagamento> pagamentos = pagamentoRepository.findByAlunoId(aluno.getId());
 
         // 4. Monta o pacotão (DTO) para enviar ao front-end
-        return new FichaAlunoDTO(
+        Double totalDevendo = pagamentos.stream()
+                .filter(p -> !p.isPago()) // Pega só os não pagos
+                .filter(p -> p.getValor() != null) // <-- ADICIONE ISSO: Ignora se o valor for nulo
+                .mapToDouble(p -> p.getValor())
+                .sum();
+
+        FichaAlunoDTO ficha = new FichaAlunoDTO(
                 aluno.getNome(),
                 aluno.getTurma(),
                 resp.getName(),
                 pagamentos
         );
+
+        ficha.setValorTotalEmAberto(totalDevendo);
+
+        return ficha;
     }
 }

@@ -16,7 +16,7 @@ public class PagamentoController {
 
     @PostMapping
     public Pagamento registrarPagamento(@RequestBody Pagamento pagamento){
-        return pagamentoService.MesPagamento(pagamento);
+        return pagamentoService.cadastrarPagamento(pagamento);
     }
 
     @GetMapping
@@ -28,6 +28,12 @@ public class PagamentoController {
     public List<Pagamento> listarPendentes(@PathVariable String alunoCPF){
         return pagamentoService.ListarPendentes(alunoCPF);
     }
+
+    @GetMapping("/devedores")
+    public List<Pagamento> buscarDevedores() {
+        return pagamentoService.listarDevedores();
+    }
+
 }
 
 

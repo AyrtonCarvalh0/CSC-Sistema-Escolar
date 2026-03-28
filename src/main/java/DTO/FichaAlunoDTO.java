@@ -10,12 +10,23 @@ public class FichaAlunoDTO {
     private String turma;
     private String nomeResponsavel;
     private List<Pagamento> mensalidades;
+    private Double valorTotalEmAberto;
 
     public FichaAlunoDTO(String nomeAluno, String turma, String nomeResponsavel, List<Pagamento> mensalidades) {
         this.nomeAluno = nomeAluno;
         this.turma = turma;
         this.nomeResponsavel = nomeResponsavel;
         this.mensalidades = mensalidades;
+        this.valorTotalEmAberto = valorTotalEmAberto;
+    }
+
+
+    public Double getValorTotalEmAberto() {
+        return valorTotalEmAberto;
+    }
+
+    public void setValorTotalEmAberto(Double valorTotalEmAberto) {
+        this.valorTotalEmAberto = valorTotalEmAberto;
     }
 
     public String getNomeAluno() {
