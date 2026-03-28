@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface PagamentoRepository extends MongoRepository<Pagamento, String> {
 
+    List<Pagamento> findByAlunoId(String alunoId);
     List<Pagamento> findByAlunoIdAndPago(String alunoId, boolean pago);
 
 }

@@ -30,10 +30,9 @@ public class AlunoController {
             return Collections.singletonList(alunoService.buscarAlunoPorNome(nome));
         }
 
-        @GetMapping("/{id}/completo")
-        public Object buscarCompleto(@PathVariable String id){
-            // Retorna aluno com todos seus dados básicos + dados relacionados
-            return alunoService.buscarFichaCompleta(id);
-        }
+    @GetMapping("/ficha/{cpf}")
+    public Object buscarCompleto(@PathVariable("cpf") String cpf) { // O nome dentro das aspas deve ser igual ao da URL
+        return alunoService.buscarFichaCompleta(cpf);
     }
+}
 

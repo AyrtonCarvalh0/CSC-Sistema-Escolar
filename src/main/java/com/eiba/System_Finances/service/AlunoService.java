@@ -70,14 +70,15 @@ public class AlunoService {
 
     public FichaAlunoDTO buscarFichaCompleta(String cpf) {
         // 1. Busca o aluno pelo CPF
-        Aluno aluno = (Aluno) alunoRepository.findByCpf(cpf);
+        Aluno aluno = alunoRepository.findByCpf(cpf)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado com o CPF: " + cpf));
 
         // 2. Busca os dados do responsável usando o ID que está no aluno
         Responsavel resp = responsavel.findById(aluno.getResponsavelId())
                 .orElseThrow(() -> new RuntimeException("Responsável não encontrado"));
-
-        // 3. Busca todos os pagamentos atrelados a esse aluno
-        List<Pagamento> pagamentos = pagamentoRepository.findByAlunoIdAndPago(aluno.getResponsavelId(), true);
+        
+        // 3. Busca todos os pagamentos atrelados a esse aluno (usando o ID do Aluno, não do pai/mãe)
+        List<Pagamento> pagamentos = pagamentoRepository.findByAlunoId(aluno.getId());
 
         // 4. Monta o pacotão (DTO) para enviar ao front-end
         return new FichaAlunoDTO(
