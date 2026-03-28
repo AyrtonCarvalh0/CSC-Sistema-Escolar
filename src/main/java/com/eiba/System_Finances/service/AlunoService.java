@@ -7,6 +7,7 @@ import com.eiba.System_Finances.repository.ResponsavelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,10 +18,10 @@ public class AlunoService {
     @Autowired
     private AlunoRepository alunoRepository;
     
-    public Aluno dadosAluno(String id, String nome, String cpf, String responsavelId, Date data_nascimento){
+    public Aluno dadosAluno(String id, String nome, String cpf, String responsavelId, LocalDate data_nascimento){
         Aluno aluno = new Aluno();
         aluno.setId(id);
-        aluno.setnome(nome);
+        aluno.setNome(nome);
         aluno.setCpf(cpf);
         aluno.setResponsavelId(responsavelId);
         aluno.setData_nascimento(data_nascimento);
@@ -49,7 +50,7 @@ public class AlunoService {
     public Aluno buscarAlunoPorNome (String nome){
         List<Aluno> alunos = alunoRepository.findAll();
         for(Aluno aluno : alunos){
-            if(aluno.getnome().equalsIgnoreCase(nome)){
+            if(aluno.getNome().equalsIgnoreCase(nome)){
                 return aluno;
             }
         }

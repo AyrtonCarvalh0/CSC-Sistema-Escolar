@@ -7,11 +7,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Pagamento {
 
     private String id;
-    private Aluno alunoId;
+    private String alunoId;
     private String mes;
     private boolean pago;
 
-    public Pagamento(String id, Aluno alunoId, String mes, boolean pago) {
+    public Pagamento(String id, String alunoId, String mes, boolean pago) {
         this.id = id;
         this.alunoId = alunoId;
         this.mes = mes;
@@ -26,11 +26,11 @@ public class Pagamento {
         this.id = id;
     }
 
-    public Aluno getAlunoId() {
+    public String getAlunoId() {
         return alunoId;
     }
 
-    public void setAlunoId(Aluno alunoId) {
+    public void setAlunoId(String alunoId) {
         this.alunoId = alunoId;
     }
 

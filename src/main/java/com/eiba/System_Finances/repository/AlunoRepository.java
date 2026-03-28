@@ -10,5 +10,5 @@ import java.util.List;
 public interface AlunoRepository extends MongoRepository<Aluno,String> {
     List<Aluno> findByResponsavelId(String responsavelId);
     List<Aluno> findByCpf(String alunoCpf);
-    List<Aluno> findByName(String alunoName);
+    List<Aluno> findByNome(String alunoNome);
 }
