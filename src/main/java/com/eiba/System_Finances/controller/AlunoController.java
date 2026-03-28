@@ -33,7 +33,7 @@ public class AlunoController {
         @GetMapping("/{id}/completo")
         public Object buscarCompleto(@PathVariable String id){
             // Retorna aluno com todos seus dados básicos + dados relacionados
-            return alunoService.buscarDadosCompletos(id);
+            return alunoService.buscarFichaCompleta(id);
         }
     }
 

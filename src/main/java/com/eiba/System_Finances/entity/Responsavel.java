@@ -1,6 +1,7 @@
 package com.eiba.System_Finances.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "responsavel")
@@ -10,6 +11,8 @@ public class Responsavel {
     private String id;
 
     private String name;
+
+    @Indexed(unique = true)
     private String cpf;
     private String endereço;
     private String telefone;

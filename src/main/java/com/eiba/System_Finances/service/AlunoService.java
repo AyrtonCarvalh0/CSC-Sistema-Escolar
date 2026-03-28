@@ -1,8 +1,11 @@
 package com.eiba.System_Finances.service;
 
+import DTO.FichaAlunoDTO;
 import com.eiba.System_Finances.entity.Aluno;
+import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.entity.Responsavel;
 import com.eiba.System_Finances.repository.AlunoRepository;
+import com.eiba.System_Finances.repository.PagamentoRepository;
 import com.eiba.System_Finances.repository.ResponsavelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,10 @@ public class AlunoService {
 
     @Autowired
     private AlunoRepository alunoRepository;
+    @Autowired
+    private ResponsavelRepository responsavel;
+    @Autowired
+    private PagamentoRepository pagamentoRepository;
     
     public Aluno dadosAluno(String id, String nome, String cpf, String responsavelId, LocalDate data_nascimento){
         Aluno aluno = new Aluno();
@@ -60,18 +67,24 @@ public class AlunoService {
 
         alunoRepository.deleteById(cpf);
     }
-    
-    public Object buscarDadosCompletos(String id){
-        // Busca o aluno pelos dados básicos
-        Aluno aluno = buscarAlunoPorCPF(id);
-        
-        // Aqui você pode adicionar lógica para buscar dados relacionados:
-        // - Responsavel do aluno
-        // - Matrículas
-        // - Turma
-        // - Pagamentos
-        // Por enquanto, retorna o aluno com todos seus dados
-        
-        return aluno;
+
+    public FichaAlunoDTO buscarFichaCompleta(String cpf) {
+        // 1. Busca o aluno pelo CPF
+        Aluno aluno = (Aluno) alunoRepository.findByCpf(cpf);
+
+        // 2. Busca os dados do responsável usando o ID que está no aluno
+        Responsavel resp = responsavel.findById(aluno.getResponsavelId())
+                .orElseThrow(() -> new RuntimeException("Responsável não encontrado"));
+
+        // 3. Busca todos os pagamentos atrelados a esse aluno
+        List<Pagamento> pagamentos = pagamentoRepository.findByAlunoIdAndPago(aluno.getResponsavelId(), true);
+
+        // 4. Monta o pacotão (DTO) para enviar ao front-end
+        return new FichaAlunoDTO(
+                aluno.getNome(),
+                aluno.getTurma(),
+                resp.getName(),
+                pagamentos
+        );
     }
 }
