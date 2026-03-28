@@ -1,4 +1,4 @@
-package Exceptions;
+package com.eiba.System_Finances.Exceptions;
 
 import java.io.Serializable;
 

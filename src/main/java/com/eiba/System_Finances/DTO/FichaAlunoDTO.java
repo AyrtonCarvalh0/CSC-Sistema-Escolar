@@ -1,4 +1,4 @@
-package DTO;
+package com.eiba.System_Finances.DTO;
 
 import com.eiba.System_Finances.entity.Pagamento;
 

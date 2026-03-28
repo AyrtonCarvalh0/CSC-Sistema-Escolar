@@ -1,6 +1,6 @@
 package com.eiba.System_Finances.service;
 
-import DTO.FichaAlunoDTO;
+import com.eiba.System_Finances.DTO.FichaAlunoDTO;
 import com.eiba.System_Finances.entity.Aluno;
 import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.entity.Responsavel;
@@ -11,11 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import static java.lang.Long.sum;
 
 @Service
 public class AlunoService {

@@ -1,4 +1,4 @@
-package Exceptions;
+package com.eiba.System_Finances.Exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
