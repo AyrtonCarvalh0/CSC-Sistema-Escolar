@@ -2,6 +2,8 @@ package com.eiba.System_Finances.entity;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Document(collection = "pagamento")
 public class Pagamento {
 
@@ -10,13 +12,23 @@ public class Pagamento {
     private String mes;
     private Double valor;
     private boolean pago;
+    private LocalDateTime dataPagamento; // Importe do java.time.LocalDateTime
 
-    public Pagamento(String id, String alunoId, String mes, Double valor, boolean pago) {
+    public Pagamento(String id, String alunoId, String mes, Double valor, boolean pago, LocalDateTime dataPagamento) {
         this.id = id;
         this.alunoId = alunoId;
         this.mes = mes;
         this.valor = valor;
         this.pago = pago;
+        this.dataPagamento = dataPagamento;
+    }
+
+    public LocalDateTime getDataPagamento() {
+        return dataPagamento;
+    }
+
+    public void setDataPagamento(LocalDateTime dataPagamento) {
+        this.dataPagamento = dataPagamento;
     }
 
     public Double getValor() {

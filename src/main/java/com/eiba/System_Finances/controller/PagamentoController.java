@@ -46,6 +46,11 @@ public class PagamentoController {
         return ResponseEntity.ok(pagamentoService.listarDevedoresPorMes(mes));
     }
 
+    @GetMapping("/{id}/recibo")
+    public ResponseEntity<String> obterRecibo(@PathVariable String id) {
+        return ResponseEntity.ok(pagamentoService.gerarRecibo(id));
+    }
+
 }
 
 

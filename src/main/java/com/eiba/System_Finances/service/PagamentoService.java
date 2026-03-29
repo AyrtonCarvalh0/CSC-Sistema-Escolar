@@ -1,16 +1,21 @@
 package com.eiba.System_Finances.service;
 
 import com.eiba.System_Finances.DTO.DevedorDTO;
+import com.eiba.System_Finances.entity.Aluno;
 import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.repository.AlunoRepository;
 import com.eiba.System_Finances.repository.PagamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 public class PagamentoService {
+
+
 
     @Autowired
     private PagamentoRepository pagamentoRepository;
@@ -57,14 +62,12 @@ public class PagamentoService {
     }
 
     public Pagamento darBaixaPagamento(String id) {
-        // 1. Busca o pagamento pelo ID único dele
         Pagamento pagamento = pagamentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pagamento não encontrado com o ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
 
-        // 2. Muda o status para pago
         pagamento.setPago(true);
+        pagamento.setDataPagamento(LocalDateTime.now()); // Salva o dia e a hora exata da baixa
 
-        // 3. Salva a alteração
         return pagamentoRepository.save(pagamento);
     }
 
@@ -78,6 +81,26 @@ public class PagamentoService {
 
             return new DevedorDTO(nome, pagamento.getMes(), pagamento.getValor());
         }).toList();
+    }
+
+    public String gerarRecibo(String pagamentoId) {
+        Pagamento pag = pagamentoRepository.findById(pagamentoId)
+                .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
+
+        Aluno aluno = alunoRepository.findById(pag.getAlunoId())
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        return String.format(
+                "--- RECIBO DE PAGAMENTO ---\n" +
+                        "Aluno: %s\n" +
+                        "Mês: %s\n" +
+                        "Valor: R$ %.2f\n" +
+                        "Status: QUITADO\n" +
+                        "Data do Recebimento: %s\n" +
+                        "---------------------------",
+                aluno.getNome(), pag.getMes(), pag.getValor(),
+                pag.getDataPagamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+        );
     }
 
 

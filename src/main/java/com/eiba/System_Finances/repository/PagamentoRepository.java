@@ -16,4 +16,7 @@ public interface PagamentoRepository extends MongoRepository<Pagamento, String> 
     // Busca devedores de um mês específico
     List<Pagamento> findByMesAndPagoFalse(String mes);
 
+    // Retorna 'true' se encontrar QUALQUER pagamento não pago para este aluno
+    boolean existsByAlunoIdAndPagoFalse(String alunoId);
+
 }

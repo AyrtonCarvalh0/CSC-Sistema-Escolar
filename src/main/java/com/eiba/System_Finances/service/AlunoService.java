@@ -106,4 +106,22 @@ public class AlunoService {
 
         return alunos;
     }
+
+    public void excluirAluno(String id) {
+        // 1. Verificar se o aluno existe
+        if (!alunoRepository.existsById(id)) {
+            throw new RuntimeException("Erro: Aluno não encontrado.");
+        }
+
+        // 2. A TRAVA: Verificar se existem dívidas
+        boolean temDivida = pagamentoRepository.existsByAlunoIdAndPagoFalse(id);
+
+        if (temDivida) {
+            throw new RuntimeException("Não é possível excluir: Este aluno possui mensalidades pendentes!");
+        }
+
+        // 3. Se passou pela trava, pode deletar
+        alunoRepository.deleteById(id);
+    }
+
 }
