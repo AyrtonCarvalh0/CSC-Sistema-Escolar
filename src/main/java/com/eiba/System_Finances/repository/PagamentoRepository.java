@@ -19,4 +19,5 @@ public interface PagamentoRepository extends MongoRepository<Pagamento, String> 
     // Retorna 'true' se encontrar QUALQUER pagamento não pago para este aluno
     boolean existsByAlunoIdAndPagoFalse(String alunoId);
 
+    List<Pagamento> findByMes(String mes);
 }

@@ -1,6 +1,7 @@
 package com.eiba.System_Finances.controller;
 
 import com.eiba.System_Finances.DTO.DevedorDTO;
+import com.eiba.System_Finances.DTO.ResumoCaixaDTO;
 import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.service.PagamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,11 @@ public class PagamentoController {
     public ResponseEntity<String> gerarMes(@RequestParam String mes, @RequestParam Double valor) {
         String resultado = pagamentoService.gerarMensalidadesDoMes(mes, valor);
         return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/resumo")
+    public ResponseEntity<ResumoCaixaDTO> obterResumo(@RequestParam String mes) {
+        return ResponseEntity.ok(pagamentoService.gerarResumoDoMes(mes));
     }
 
 }

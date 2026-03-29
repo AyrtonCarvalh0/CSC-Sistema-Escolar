@@ -1,6 +1,7 @@
 package com.eiba.System_Finances.service;
 
 import com.eiba.System_Finances.DTO.DevedorDTO;
+import com.eiba.System_Finances.DTO.ResumoCaixaDTO;
 import com.eiba.System_Finances.entity.Aluno;
 import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.repository.AlunoRepository;
@@ -123,6 +124,24 @@ public class PagamentoService {
         });
 
         return "Sucesso! Foram geradas " + todosAlunos.size() + " mensalidades para o mês de " + mesReferencia;
+    }
+
+    public ResumoCaixaDTO gerarResumoDoMes(String mes) {
+        // Agora o repository vai encontrar!
+        List<Pagamento> pagamentos = pagamentoRepository.findByMes(mes);
+
+        Double recebido = pagamentos.stream()
+                .filter(p -> p.isPago()) // Use isPago()
+                .mapToDouble(p -> p.getValor())
+                .sum();
+
+        Double pendente = pagamentos.stream()
+                .filter(p -> !p.isPago()) // Use !isPago()
+                .mapToDouble(p -> p.getValor())
+                .sum();
+
+        // Retorna o DTO que você criou
+        return new ResumoCaixaDTO(recebido, pendente, pagamentos.size());
     }
 
 
