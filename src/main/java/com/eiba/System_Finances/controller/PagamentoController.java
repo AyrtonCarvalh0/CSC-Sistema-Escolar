@@ -51,6 +51,12 @@ public class PagamentoController {
         return ResponseEntity.ok(pagamentoService.gerarRecibo(id));
     }
 
+    @PostMapping("/gerar-mes")
+    public ResponseEntity<String> gerarMes(@RequestParam String mes, @RequestParam Double valor) {
+        String resultado = pagamentoService.gerarMensalidadesDoMes(mes, valor);
+        return ResponseEntity.ok(resultado);
+    }
+
 }
 
 

@@ -103,5 +103,27 @@ public class PagamentoService {
         );
     }
 
+    public String gerarMensalidadesDoMes(String mesReferencia, Double valorPadrao) {
+        // 1. Busca todos os alunos cadastrados
+        List<Aluno> todosAlunos = alunoRepository.findAll();
+
+        if (todosAlunos.isEmpty()) {
+            throw new RuntimeException("Não há alunos cadastrados para gerar cobranças.");
+        }
+
+        // 2. Cria um pagamento para cada um deles
+        todosAlunos.forEach(aluno -> {
+            Pagamento novoPag = new Pagamento();
+            novoPag.setAlunoId(aluno.getId());
+            novoPag.setMes(mesReferencia);
+            novoPag.setValor(valorPadrao);
+            novoPag.setPago(false); // Começa como devedor
+
+            pagamentoRepository.save(novoPag);
+        });
+
+        return "Sucesso! Foram geradas " + todosAlunos.size() + " mensalidades para o mês de " + mesReferencia;
+    }
+
 
 }

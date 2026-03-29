@@ -23,6 +23,10 @@ public class Pagamento {
         this.dataPagamento = dataPagamento;
     }
 
+    public Pagamento() {
+
+    }
+
     public LocalDateTime getDataPagamento() {
         return dataPagamento;
     }
