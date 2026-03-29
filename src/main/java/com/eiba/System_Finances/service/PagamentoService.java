@@ -1,6 +1,8 @@
 package com.eiba.System_Finances.service;
 
+import com.eiba.System_Finances.DTO.DevedorDTO;
 import com.eiba.System_Finances.entity.Pagamento;
+import com.eiba.System_Finances.repository.AlunoRepository;
 import com.eiba.System_Finances.repository.PagamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,9 @@ public class PagamentoService {
 
     @Autowired
     private PagamentoRepository pagamentoRepository;
+    
+    @Autowired
+    private AlunoRepository alunoRepository;
 
     public Pagamento cadastrarPagamento(Pagamento pagamento) {
         // 1. Validação de Duplicidade
@@ -37,8 +42,18 @@ public class PagamentoService {
         return pagamentoRepository.findByAlunoIdAndPago(alunoCPF, false);
     }
 
-    public List<Pagamento> listarDevedores() {
-        return pagamentoRepository.findByPagoFalse();
+    public List<DevedorDTO> listarDevedoresComNome() {
+        List<Pagamento> devedores = pagamentoRepository.findByPagoFalse();
+
+        // Transformamos a lista de Pagamentos em uma lista de DevedorDTO
+        return devedores.stream().map(pagamento -> {
+            // Para cada pagamento, buscamos o aluno pelo ID
+            String nome = alunoRepository.findById(pagamento.getAlunoId())
+                    .map(aluno -> aluno.getNome())
+                    .orElse("Aluno não identificado");
+
+            return new DevedorDTO(nome, pagamento.getMes(), pagamento.getValor());
+        }).toList();
     }
 
     public Pagamento darBaixaPagamento(String id) {

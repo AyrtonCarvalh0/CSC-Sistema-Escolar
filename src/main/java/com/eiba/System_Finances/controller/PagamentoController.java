@@ -1,5 +1,6 @@
 package com.eiba.System_Finances.controller;
 
+import com.eiba.System_Finances.DTO.DevedorDTO;
 import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.service.PagamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,8 @@ public class PagamentoController {
     }
 
     @GetMapping("/devedores")
-    public List<Pagamento> buscarDevedores() {
-        return pagamentoService.listarDevedores();
+    public ResponseEntity<List<DevedorDTO>> buscarDevedores() {
+        return ResponseEntity.ok(pagamentoService.listarDevedoresComNome());
     }
 
     @PatchMapping("/{id}/confirmar")
