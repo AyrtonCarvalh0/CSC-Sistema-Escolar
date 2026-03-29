@@ -3,6 +3,7 @@ package com.eiba.System_Finances.controller;
 import com.eiba.System_Finances.entity.Aluno;
 import com.eiba.System_Finances.service.AlunoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -25,14 +26,14 @@ public class AlunoController {
             return alunoService.buscarAlunoPorCPF(cpf);
         }
 
-        @GetMapping("/nome/{nome}")
-        public List<Aluno> buscarPorNome(@PathVariable String nome){
-            return Collections.singletonList(alunoService.buscarAlunoPorNome(nome));
+        @GetMapping("/ficha/{cpf}")
+        public Object buscarCompleto(@PathVariable("cpf") String cpf) { // O nome dentro das aspas deve ser igual ao da URL
+            return alunoService.buscarFichaCompleta(cpf);
         }
 
-    @GetMapping("/ficha/{cpf}")
-    public Object buscarCompleto(@PathVariable("cpf") String cpf) { // O nome dentro das aspas deve ser igual ao da URL
-        return alunoService.buscarFichaCompleta(cpf);
-    }
+        @GetMapping("/buscar-nome")
+        public ResponseEntity<List<Aluno>> buscarPorNome(@RequestParam String nome) {
+            return ResponseEntity.ok(alunoService.buscarPorParteDoNome(nome));
+        }
 }
 

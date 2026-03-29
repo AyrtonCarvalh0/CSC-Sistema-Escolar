@@ -41,5 +41,17 @@ public class PagamentoService {
         return pagamentoRepository.findByPagoFalse();
     }
 
+    public Pagamento darBaixaPagamento(String id) {
+        // 1. Busca o pagamento pelo ID único dele
+        Pagamento pagamento = pagamentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pagamento não encontrado com o ID: " + id));
+
+        // 2. Muda o status para pago
+        pagamento.setPago(true);
+
+        // 3. Salva a alteração
+        return pagamentoRepository.save(pagamento);
+    }
+
 
 }

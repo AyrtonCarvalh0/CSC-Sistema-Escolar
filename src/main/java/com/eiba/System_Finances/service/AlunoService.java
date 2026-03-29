@@ -96,4 +96,14 @@ public class AlunoService {
 
         return ficha;
     }
+
+    public List<Aluno> buscarPorParteDoNome(String nome) {
+        List<Aluno> alunos = alunoRepository.findByNomeContainingIgnoreCase(nome);
+
+        if (alunos.isEmpty()) {
+            throw new RuntimeException("Nenhum aluno encontrado com o nome: " + nome);
+        }
+
+        return alunos;
+    }
 }

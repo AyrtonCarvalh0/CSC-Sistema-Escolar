@@ -12,4 +12,5 @@ public interface AlunoRepository extends MongoRepository<Aluno,String> {
     List<Aluno> findByResponsavelId(String responsavelId);
     Optional<Aluno> findByCpf(String cpf);
     List<Aluno> findByNome(String alunoNome);
+    List<Aluno> findByNomeContainingIgnoreCase(String nome);
 }

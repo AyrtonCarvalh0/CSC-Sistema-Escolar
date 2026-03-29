@@ -3,6 +3,7 @@ package com.eiba.System_Finances.controller;
 import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.service.PagamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,11 @@ public class PagamentoController {
     @GetMapping("/devedores")
     public List<Pagamento> buscarDevedores() {
         return pagamentoService.listarDevedores();
+    }
+
+    @PatchMapping("/{id}/confirmar")
+    public ResponseEntity<Pagamento> confirmarPagamento(@PathVariable String id) {
+        return ResponseEntity.ok(pagamentoService.darBaixaPagamento(id));
     }
 
 }
