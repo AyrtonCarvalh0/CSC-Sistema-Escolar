@@ -68,5 +68,17 @@ public class PagamentoService {
         return pagamentoRepository.save(pagamento);
     }
 
+    public List<DevedorDTO> listarDevedoresPorMes(String mes) {
+        List<Pagamento> devedores = pagamentoRepository.findByMesAndPagoFalse(mes);
+
+        return devedores.stream().map(pagamento -> {
+            String nome = alunoRepository.findById(pagamento.getAlunoId())
+                    .map(aluno -> aluno.getNome())
+                    .orElse("Aluno não encontrado");
+
+            return new DevedorDTO(nome, pagamento.getMes(), pagamento.getValor());
+        }).toList();
+    }
+
 
 }

@@ -41,6 +41,11 @@ public class PagamentoController {
         return ResponseEntity.ok(pagamentoService.darBaixaPagamento(id));
     }
 
+    @GetMapping("/devedores/busca")
+    public ResponseEntity<List<DevedorDTO>> buscarDevedoresPorMes(@RequestParam String mes) {
+        return ResponseEntity.ok(pagamentoService.listarDevedoresPorMes(mes));
+    }
+
 }
 
 
