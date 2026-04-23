@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class MatriculaService {
@@ -23,32 +24,29 @@ public class MatriculaService {
     @Autowired
     private TurmaRepository turmaRepository;
 
-    public Matrícula matricularAluno(Matrícula matrícula){
+    public Matrícula matricularAluno(Matrícula matrícula) {
         return matriculaRepository.save(matrícula);
     }
 
-    public Matrícula bucarMatricula(String id){
-        if(!matriculaRepository.existsById(id)){
+    public Matrícula bucarMatricula(UUID id) {
+        if (!matriculaRepository.existsById(id)) {
             throw new RuntimeException("Id não encontrado");
         }
-       return matriculaRepository.findById(id).orElse(null);
+        return matriculaRepository.findById(id).orElse(null);
     }
 
-    public List<Matrícula> listarTodasMatriculas(){
+    public List<Matrícula> listarTodasMatriculas() {
         return matriculaRepository.findAll();
     }
 
-    public List<Matrícula> listarMatriculasDaTurma(String turmaID){
-        return matriculaRepository.findByTurmaId(turmaID);
+    public List<Matrícula> listarMatriculasDaTurma(UUID turmaID) {
+        return matriculaRepository.findByTurma_Id(turmaID);
     }
 
-    public void cancelarMatricula(String id){
-        if(matriculaRepository.findById(id) == null){
+    public void cancelarMatricula(UUID id) {
+        if (!matriculaRepository.existsById(id)) {
             throw new RuntimeException("Id não encontrado");
         }
         matriculaRepository.deleteById(id);
     }
-
-
-
 }

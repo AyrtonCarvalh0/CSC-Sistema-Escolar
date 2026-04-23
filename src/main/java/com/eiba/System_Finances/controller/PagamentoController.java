@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/pagamentos")
@@ -18,17 +19,17 @@ public class PagamentoController {
     private PagamentoService pagamentoService;
 
     @PostMapping
-    public Pagamento registrarPagamento(@RequestBody Pagamento pagamento){
+    public Pagamento registrarPagamento(@RequestBody Pagamento pagamento) {
         return pagamentoService.cadastrarPagamento(pagamento);
     }
 
     @GetMapping
-    public List<Pagamento> listarTodosPagamentos(){
+    public List<Pagamento> listarTodosPagamentos() {
         return pagamentoService.listarPagamentos();
     }
 
     @GetMapping("/pendentes/{alunoCPF}")
-    public List<Pagamento> listarPendentes(@PathVariable String alunoCPF){
+    public List<Pagamento> listarPendentes(@PathVariable String alunoCPF) {
         return pagamentoService.ListarPendentes(alunoCPF);
     }
 
@@ -38,7 +39,7 @@ public class PagamentoController {
     }
 
     @PatchMapping("/{id}/confirmar")
-    public ResponseEntity<Pagamento> confirmarPagamento(@PathVariable String id) {
+    public ResponseEntity<Pagamento> confirmarPagamento(@PathVariable UUID id) {
         return ResponseEntity.ok(pagamentoService.darBaixaPagamento(id));
     }
 
@@ -48,13 +49,13 @@ public class PagamentoController {
     }
 
     @GetMapping("/{id}/recibo")
-    public ResponseEntity<String> obterRecibo(@PathVariable String id) {
+    public ResponseEntity<String> obterRecibo(@PathVariable UUID id) {
         return ResponseEntity.ok(pagamentoService.gerarRecibo(id));
     }
 
     @PostMapping("/gerar-mes")
-    public ResponseEntity<String> gerarMes(@RequestParam String mes, @RequestParam Double valor) {
-        String resultado = pagamentoService.gerarMensalidadesDoMes(mes, valor);
+    public ResponseEntity<String> gerarMes(@RequestParam String mes) {
+        String resultado = pagamentoService.gerarMensalidadesDoMes(mes);
         return ResponseEntity.ok(resultado);
     }
 
@@ -63,6 +64,10 @@ public class PagamentoController {
         return ResponseEntity.ok(pagamentoService.gerarResumoDoMes(mes));
     }
 
+    @GetMapping("/devedores/turma")
+    public ResponseEntity<List<DevedorDTO>> devedoresPorTurma(
+            @RequestParam String mes,
+            @RequestParam UUID turmaId) {
+        return ResponseEntity.ok(pagamentoService.listarDevedoresPorMesETurma(mes, turmaId));
+    }
 }
-
-

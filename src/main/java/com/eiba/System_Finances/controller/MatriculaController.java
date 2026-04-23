@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/matriculas")
@@ -15,29 +16,27 @@ public class MatriculaController {
     private MatriculaService matriculaService;
 
     @PostMapping
-    public Matrícula matricularAluno(@RequestBody Matrícula matrícula){
+    public Matrícula matricularAluno(@RequestBody Matrícula matrícula) {
         return matriculaService.matricularAluno(matrícula);
     }
 
     @GetMapping("/{id}")
-    public Matrícula buscarMatriculaById(@PathVariable String id){
+    public Matrícula buscarMatriculaById(@PathVariable UUID id) {
         return matriculaService.bucarMatricula(id);
     }
 
     @GetMapping
-    public List<Matrícula> listarTodasMatriculas(){
+    public List<Matrícula> listarTodasMatriculas() {
         return matriculaService.listarTodasMatriculas();
     }
 
     @GetMapping("/turma/{turmaId}")
-    public List<Matrícula> listarMatriculasDaTurma(@PathVariable String turmaId){
+    public List<Matrícula> listarMatriculasDaTurma(@PathVariable UUID turmaId) {
         return matriculaService.listarMatriculasDaTurma(turmaId);
     }
 
     @DeleteMapping("/{id}")
-    public void cancelarMatricula(@PathVariable String id){
+    public void cancelarMatricula(@PathVariable UUID id) {
         matriculaService.cancelarMatricula(id);
     }
 }
-
-

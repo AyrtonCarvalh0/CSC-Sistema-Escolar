@@ -1,48 +1,38 @@
 package com.eiba.System_Finances.entity;
 
+import jakarta.persistence.*;
+import java.util.UUID;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document(collection = "matricula")
+@Entity
+@Table(name = "matricula")
 public class Matrícula {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    private String id;
+    @ManyToOne
+    @JoinColumn(name = "aluno_id")
+    private Aluno aluno;
 
-    private String alunoId;
+    @ManyToOne
+    @JoinColumn(name = "turma_id")
+    private Turma turma;
 
-    private String turmaId;
+    public Matrícula() {}
 
-    public Matrícula() {
-    }
-
-    public Matrícula(String id, String alunoId, String turmaId) {
+    public Matrícula(UUID id, Aluno aluno, Turma turma) {
         this.id = id;
-        this.alunoId = alunoId;
-        this.turmaId = turmaId;
+        this.aluno = aluno;
+        this.turma = turma;
     }
 
-    public String getId() {
-        return id;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public Aluno getAluno() { return aluno; }
+    public void setAluno(Aluno aluno) { this.aluno = aluno; }
 
-    public String getAlunoId() {
-        return alunoId;
-    }
-
-    public void setAlunoId(String alunoId) {
-        this.alunoId = alunoId;
-    }
-
-    public String getTurmaId() {
-        return turmaId;
-    }
-
-    public void setTurmaId(String turmaId) {
-        this.turmaId = turmaId;
-    }
+    public Turma getTurma() { return turma; }
+    public void setTurma(Turma turma) { this.turma = turma; }
 }

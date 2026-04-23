@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw dependency:resolve -q)",
+      "Bash(where java *)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Zulu/zulu-21\" ./mvnw dependency:resolve -q)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Zulu/zulu-21\" ./mvnw compile)",
+      "Bash(./mvnw compile *)",
+      "Bash(JAVA_HOME=\"C:\\\\Program Files\\\\Microsoft\\\\jdk-21.0.7.6-hotspot\" ./mvnw compile -q)",
+      "Bash(JAVA_HOME=\"/c/Program Files/Zulu/zulu-21\" ./mvnw compile)",
+      "Bash(JAVA_HOME=\"/c/Program Files/Zulu/zulu-21\" ./mvnw compile -q)"
+    ]
+  }
+}

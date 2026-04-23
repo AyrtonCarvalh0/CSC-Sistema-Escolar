@@ -1,28 +1,31 @@
 package com.eiba.System_Finances.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import java.util.UUID;
 
-@Document(collection = "responsavel")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Entity
+@Table(name = "responsavel")
 public class Responsavel {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     private String name;
 
-    @Indexed(unique = true)
+    @Column(unique = true)
     private String cpf;
+
+    @Column(name = "endereco")
     private String endereço;
     private String telefone;
     private String email;
 
+    public Responsavel() {}
 
-    public Responsavel(){
-
-    }
-    public Responsavel(String id, String name, String cpf, String endereço, String telefone, String email) {
+    public Responsavel(UUID id, String name, String cpf, String endereço, String telefone, String email) {
         this.id = id;
         this.name = name;
         this.cpf = cpf;
@@ -31,53 +34,21 @@ public class Responsavel {
         this.email = email;
     }
 
-    public String getId() {
-        return id;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getEndereço() { return endereço; }
+    public void setEndereço(String endereço) { this.endereço = endereço; }
 
-    public String getCpf() {
-        return cpf;
-    }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public String getEndereço() {
-        return endereço;
-    }
-
-    public void setEndereço(String endereço) {
-        this.endereço = endereço;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }

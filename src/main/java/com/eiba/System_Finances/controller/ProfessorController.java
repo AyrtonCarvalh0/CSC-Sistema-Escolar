@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/professores")
@@ -15,30 +16,28 @@ public class ProfessorController {
     private ProfessorService professorService;
 
     @PostMapping
-    public Professor cadastrarProfessor(@RequestBody Professor professor){
+    public Professor cadastrarProfessor(@RequestBody Professor professor) {
         return professorService.cadastrarProfessor(professor);
     }
 
     @GetMapping("/{id}")
-    public Professor buscarProfessorById(@PathVariable String id){
+    public Professor buscarProfessorById(@PathVariable UUID id) {
         return professorService.buscarPorId(id);
     }
 
     @GetMapping
-    public List<Professor> listarTodosProfessores(){
+    public List<Professor> listarTodosProfessores() {
         return professorService.listarTodos();
     }
 
     @PutMapping("/{id}")
-    public Professor atualizarProfessor(@PathVariable String id, @RequestBody Professor professor){
+    public Professor atualizarProfessor(@PathVariable UUID id, @RequestBody Professor professor) {
         professor.setId(id);
         return professorService.atualizarProfessor(professor);
     }
 
     @DeleteMapping("/{id}")
-    public void deletarProfessor(@PathVariable String id){
+    public void deletarProfessor(@PathVariable UUID id) {
         professorService.deletarById(id);
     }
 }
-
-

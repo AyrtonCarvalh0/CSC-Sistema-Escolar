@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/aluno")
@@ -19,6 +19,11 @@ public class AlunoController {
         @PostMapping
         public Aluno criar(@RequestBody Aluno aluno){
             return alunoService.cadastrarAluno(aluno);
+        }
+
+        @GetMapping
+        public ResponseEntity<List<Aluno>> listarTodos() {
+            return ResponseEntity.ok(alunoService.listarTodosOsAlunos());
         }
 
         @GetMapping("/cpf/{cpf}")
@@ -34,6 +39,17 @@ public class AlunoController {
         @GetMapping("/buscar-nome")
         public ResponseEntity<List<Aluno>> buscarPorNome(@RequestParam String nome) {
             return ResponseEntity.ok(alunoService.buscarPorParteDoNome(nome));
+        }
+
+        @PutMapping("/{id}")
+        public ResponseEntity<Aluno> atualizarAluno(@PathVariable UUID id, @RequestBody Aluno aluno) {
+            return ResponseEntity.ok(alunoService.atualizarAluno(id, aluno));
+        }
+
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> excluirAluno(@PathVariable UUID id) {
+            alunoService.excluirAluno(id);
+            return ResponseEntity.noContent().build();
         }
 }
 

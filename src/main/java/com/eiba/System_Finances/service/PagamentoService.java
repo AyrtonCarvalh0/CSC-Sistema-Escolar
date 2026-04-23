@@ -9,25 +9,24 @@ import com.eiba.System_Finances.repository.PagamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PagamentoService {
 
-
-
     @Autowired
     private PagamentoRepository pagamentoRepository;
-    
+
     @Autowired
     private AlunoRepository alunoRepository;
 
     public Pagamento cadastrarPagamento(Pagamento pagamento) {
-        // 1. Validação de Duplicidade
-        boolean jaExiste = pagamentoRepository.existsByAlunoIdAndMes(
-                pagamento.getAlunoId(),
+        boolean jaExiste = pagamentoRepository.existsByAluno_IdAndMes(
+                pagamento.getAluno().getId(),
                 pagamento.getMes()
         );
 
@@ -36,60 +35,69 @@ public class PagamentoService {
                     + pagamento.getMes() + " para este aluno.");
         }
 
-        // 2. Se não existir, salva normalmente
         return pagamentoRepository.save(pagamento);
     }
 
-    public List<Pagamento> listarPagamentos (){
+    public List<Pagamento> listarPagamentos() {
         return pagamentoRepository.findAll();
     }
 
-    public List<Pagamento> ListarPendentes(String alunoCPF){
-        return pagamentoRepository.findByAlunoIdAndPago(alunoCPF, false);
+    public List<Pagamento> ListarPendentes(String alunoCPF) {
+        Aluno aluno = alunoRepository.findByCpf(alunoCPF)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado com CPF: " + alunoCPF));
+        return pagamentoRepository.findByAlunoAndPago(aluno, false);
     }
 
     public List<DevedorDTO> listarDevedoresComNome() {
         List<Pagamento> devedores = pagamentoRepository.findByPagoFalse();
 
-        // Transformamos a lista de Pagamentos em uma lista de DevedorDTO
         return devedores.stream().map(pagamento -> {
-            // Para cada pagamento, buscamos o aluno pelo ID
-            String nome = alunoRepository.findById(pagamento.getAlunoId())
-                    .map(aluno -> aluno.getNome())
-                    .orElse("Aluno não identificado");
-
+            String nome = pagamento.getAluno() != null
+                    ? pagamento.getAluno().getNome()
+                    : "Aluno não identificado";
             return new DevedorDTO(nome, pagamento.getMes(), pagamento.getValor());
         }).toList();
     }
 
-    public Pagamento darBaixaPagamento(String id) {
+    public Pagamento darBaixaPagamento(UUID id) {
         Pagamento pagamento = pagamentoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
 
+        Double valorAtualizado = calcularValorComAtraso(pagamento.getValor());
+        pagamento.setValor(valorAtualizado);
         pagamento.setPago(true);
-        pagamento.setDataPagamento(LocalDateTime.now()); // Salva o dia e a hora exata da baixa
+        pagamento.setDataPagamento(LocalDateTime.now());
 
         return pagamentoRepository.save(pagamento);
+    }
+
+    private Double calcularValorComAtraso(Double valorBase) {
+        int diaAtual = LocalDate.now().getDayOfMonth();
+        if (diaAtual > 10) {
+            return valorBase + 20.00;
+        } else if (diaAtual > 5) {
+            return valorBase + 10.00;
+        }
+        return valorBase;
     }
 
     public List<DevedorDTO> listarDevedoresPorMes(String mes) {
         List<Pagamento> devedores = pagamentoRepository.findByMesAndPagoFalse(mes);
 
         return devedores.stream().map(pagamento -> {
-            String nome = alunoRepository.findById(pagamento.getAlunoId())
-                    .map(aluno -> aluno.getNome())
-                    .orElse("Aluno não encontrado");
-
+            String nome = pagamento.getAluno() != null
+                    ? pagamento.getAluno().getNome()
+                    : "Aluno não encontrado";
             return new DevedorDTO(nome, pagamento.getMes(), pagamento.getValor());
         }).toList();
     }
 
-    public String gerarRecibo(String pagamentoId) {
+    public String gerarRecibo(UUID pagamentoId) {
         Pagamento pag = pagamentoRepository.findById(pagamentoId)
                 .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
 
-        Aluno aluno = alunoRepository.findById(pag.getAlunoId())
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+        Aluno aluno = pag.getAluno();
+        if (aluno == null) throw new RuntimeException("Aluno não encontrado");
 
         return String.format(
                 "--- RECIBO DE PAGAMENTO ---\n" +
@@ -104,45 +112,56 @@ public class PagamentoService {
         );
     }
 
-    public String gerarMensalidadesDoMes(String mesReferencia, Double valorPadrao) {
-        // 1. Busca todos os alunos cadastrados
-        List<Aluno> todosAlunos = alunoRepository.findAll();
-
-        if (todosAlunos.isEmpty()) {
-            throw new RuntimeException("Não há alunos cadastrados para gerar cobranças.");
+    public String gerarMensalidadesDoMes(String mesReferencia) {
+        if (pagamentoRepository.existsByMes(mesReferencia)) {
+            throw new RuntimeException("Erro: As mensalidades de "
+                    + mesReferencia + " já foram geradas anteriormente!");
         }
 
-        // 2. Cria um pagamento para cada um deles
-        todosAlunos.forEach(aluno -> {
-            Pagamento novoPag = new Pagamento();
-            novoPag.setAlunoId(aluno.getId());
-            novoPag.setMes(mesReferencia);
-            novoPag.setValor(valorPadrao);
-            novoPag.setPago(false); // Começa como devedor
+        List<Aluno> todosAlunos = alunoRepository.findAll();
 
+        todosAlunos.forEach(aluno -> {
+            Double valorBase = (aluno.getTurma() != null
+                    && aluno.getTurma().getValorMensalidade() != null)
+                    ? aluno.getTurma().getValorMensalidade()
+                    : 240.00;
+
+            Pagamento novoPag = new Pagamento();
+            novoPag.setAluno(aluno);
+            novoPag.setMes(mesReferencia);
+            novoPag.setValor(valorBase);
+            novoPag.setPago(false);
             pagamentoRepository.save(novoPag);
         });
 
-        return "Sucesso! Foram geradas " + todosAlunos.size() + " mensalidades para o mês de " + mesReferencia;
+        return "Sucesso! Foram geradas " + todosAlunos.size()
+                + " mensalidades para o mês de " + mesReferencia;
+    }
+
+    public List<DevedorDTO> listarDevedoresPorMesETurma(String mes, UUID turmaId) {
+        return pagamentoRepository.findDevedoresByMesAndTurma(mes, turmaId)
+                .stream()
+                .map(p -> new DevedorDTO(
+                        p.getAluno().getNome(),
+                        p.getMes(),
+                        p.getValor()
+                ))
+                .toList();
     }
 
     public ResumoCaixaDTO gerarResumoDoMes(String mes) {
-        // Agora o repository vai encontrar!
         List<Pagamento> pagamentos = pagamentoRepository.findByMes(mes);
 
         Double recebido = pagamentos.stream()
-                .filter(p -> p.isPago()) // Use isPago()
-                .mapToDouble(p -> p.getValor())
+                .filter(Pagamento::isPago)
+                .mapToDouble(Pagamento::getValor)
                 .sum();
 
         Double pendente = pagamentos.stream()
-                .filter(p -> !p.isPago()) // Use !isPago()
-                .mapToDouble(p -> p.getValor())
+                .filter(p -> !p.isPago())
+                .mapToDouble(Pagamento::getValor)
                 .sum();
 
-        // Retorna o DTO que você criou
         return new ResumoCaixaDTO(recebido, pendente, pagamentos.size());
     }
-
-
 }

@@ -1,72 +1,57 @@
 package com.eiba.System_Finances.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import java.util.UUID;
 
-import java.util.List;
-
-@Document(collection = "turma")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Entity
+@Table(name = "turma")
 public class Turma {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
     private String nome;
     private Integer idadeMax;
     private Integer idadeMin;
     private Integer capacidade;
+    private Double valorMensalidade;
 
-    private String professorId;
+    @ManyToOne
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
 
-    public Turma(){
+    public Turma() {}
 
-    }
-
-    public Turma(String id, String nome, Integer idadeMax, Integer idadeMin, Integer capacidade, List<Matrícula> matrícula, Professor professor) {
+    public Turma(UUID id, String nome, Integer idadeMax, Integer idadeMin, Integer capacidade, Professor professor) {
         this.id = id;
         this.nome = nome;
         this.idadeMax = idadeMax;
         this.idadeMin = idadeMin;
         this.capacidade = capacidade;
+        this.professor = professor;
     }
 
-    public String getId() {
-        return id;
-    }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getNome() {
-        return nome;
-    }
+    public Integer getIdadeMax() { return idadeMax; }
+    public void setIdadeMax(Integer idadeMax) { this.idadeMax = idadeMax; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public Integer getIdadeMin() { return idadeMin; }
+    public void setIdadeMin(Integer idadeMin) { this.idadeMin = idadeMin; }
 
-    public Integer getIdadeMax() {
-        return idadeMax;
-    }
+    public Integer getCapacidade() { return capacidade; }
+    public void setCapacidade(Integer capacidade) { this.capacidade = capacidade; }
 
-    public void setIdadeMax(Integer idadeMax) {
-        this.idadeMax = idadeMax;
-    }
+    public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) { this.professor = professor; }
 
-    public Integer getIdadeMin() {
-        return idadeMin;
-    }
-
-    public void setIdadeMin(Integer idadeMin) {
-        this.idadeMin = idadeMin;
-    }
-
-    public Integer getCapacidade() {
-        return capacidade;
-    }
-
-    public void setCapacidade(Integer capacidade) {
-        this.capacidade = capacidade;
-    }
-
+    public Double getValorMensalidade() { return valorMensalidade; }
+    public void setValorMensalidade(Double valorMensalidade) { this.valorMensalidade = valorMensalidade; }
 }

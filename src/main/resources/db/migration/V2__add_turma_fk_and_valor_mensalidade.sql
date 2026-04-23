@@ -1,0 +1,3 @@
+ALTER TABLE aluno ADD COLUMN turma_id UUID REFERENCES turma(id);
+ALTER TABLE aluno ADD COLUMN valor_mensalidade DOUBLE PRECISION;
+ALTER TABLE aluno DROP COLUMN turma;

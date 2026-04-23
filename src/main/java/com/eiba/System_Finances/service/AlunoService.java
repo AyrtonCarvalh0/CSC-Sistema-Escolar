@@ -4,14 +4,17 @@ import com.eiba.System_Finances.DTO.FichaAlunoDTO;
 import com.eiba.System_Finances.entity.Aluno;
 import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.entity.Responsavel;
+import com.eiba.System_Finances.entity.Turma;
 import com.eiba.System_Finances.repository.AlunoRepository;
 import com.eiba.System_Finances.repository.PagamentoRepository;
 import com.eiba.System_Finances.repository.ResponsavelRepository;
+import com.eiba.System_Finances.repository.TurmaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AlunoService {
@@ -21,73 +24,84 @@ public class AlunoService {
     @Autowired
     private ResponsavelRepository responsavel;
     @Autowired
+    private TurmaRepository turmaRepository;
+    @Autowired
     private PagamentoRepository pagamentoRepository;
-    
-    public Aluno dadosAluno(String id, String nome, String cpf, String responsavelId, LocalDate data_nascimento){
+
+    public Aluno dadosAluno(UUID id, String nome, String cpf, LocalDate data_nascimento) {
         Aluno aluno = new Aluno();
         aluno.setId(id);
         aluno.setNome(nome);
         aluno.setCpf(cpf);
-        aluno.setResponsavelId(responsavelId);
         aluno.setData_nascimento(data_nascimento);
         return aluno;
     }
 
-    public Aluno cadastrarAluno(Aluno aluno){
-       //Evitar duplicidade de cadastro
-       if(aluno.getId() != null && alunoRepository.existsById(aluno.getId())){
-           throw new RuntimeException("Erro: Este aluno já está cadastrado no sistema");
-       }
-        return alunoRepository.save(aluno);
+    public Aluno cadastrarAluno(Aluno aluno) {
+        if (aluno.getId() != null && alunoRepository.existsById(aluno.getId())) {
+            throw new RuntimeException("Erro: Este aluno já está cadastrado no sistema");
+        }
 
+        if (aluno.getResponsavel() != null && aluno.getResponsavel().getId() != null) {
+            Responsavel resp = responsavel.findById(aluno.getResponsavel().getId())
+                    .orElseThrow(() -> new RuntimeException("Responsável não encontrado"));
+            aluno.setResponsavel(resp);
+        }
+
+        if (aluno.getTurma() != null && aluno.getTurma().getId() != null) {
+            Turma turma = turmaRepository.findById(aluno.getTurma().getId())
+                    .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+            aluno.setTurma(turma);
+        }
+
+        return alunoRepository.save(aluno);
     }
-    public List<Aluno> listarTodosOsAlunos(){
+
+    public List<Aluno> listarTodosOsAlunos() {
         return alunoRepository.findAll();
     }
 
-    public Aluno buscarAlunoPorCPF (String cpf){
-        if(!alunoRepository.existsById(cpf)){
-            throw new RuntimeException("Id não encontrado");
-        }
-        return alunoRepository.findById(cpf).orElse(null);
+    public Aluno buscarAlunoPorCPF(String cpf) {
+        return alunoRepository.findByCpf(cpf)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado com CPF: " + cpf));
     }
-    
-    public Aluno buscarAlunoPorNome (String nome){
+
+    public Aluno buscarAlunoPorNome(String nome) {
         List<Aluno> alunos = alunoRepository.findAll();
-        for(Aluno aluno : alunos){
-            if(aluno.getNome().equalsIgnoreCase(nome)){
+        for (Aluno aluno : alunos) {
+            if (aluno.getNome().equalsIgnoreCase(nome)) {
                 return aluno;
             }
         }
         throw new RuntimeException("Aluno não encontrado");
     }
-    public void deletarAlunoporCPF (String cpf){
 
-        alunoRepository.deleteById(cpf);
+    public void deletarAlunoporCPF(String cpf) {
+        Aluno aluno = alunoRepository.findByCpf(cpf)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado com CPF: " + cpf));
+        alunoRepository.delete(aluno);
     }
 
     public FichaAlunoDTO buscarFichaCompleta(String cpf) {
-        // 1. Busca o aluno pelo CPF
         Aluno aluno = alunoRepository.findByCpf(cpf)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado com o CPF: " + cpf));
 
-        // 2. Busca os dados do responsável usando o ID que está no aluno
-        Responsavel resp = responsavel.findById(aluno.getResponsavelId())
-                .orElseThrow(() -> new RuntimeException("Responsável não encontrado"));
+        Responsavel resp = aluno.getResponsavel();
+        if (resp == null) throw new RuntimeException("Responsável não encontrado");
 
-        // 3. Busca todos os pagamentos atrelados a esse aluno (usando o ID do Aluno, não do pai/mãe)
-        List<Pagamento> pagamentos = pagamentoRepository.findByAlunoId(aluno.getId());
+        List<Pagamento> pagamentos = pagamentoRepository.findByAluno_Id(aluno.getId());
 
-        // 4. Monta o pacotão (DTO) para enviar ao front-end
         Double totalDevendo = pagamentos.stream()
-                .filter(p -> !p.isPago()) // Pega só os não pagos
-                .filter(p -> p.getValor() != null) // <-- ADICIONE ISSO: Ignora se o valor for nulo
-                .mapToDouble(p -> p.getValor())
+                .filter(p -> !p.isPago())
+                .filter(p -> p.getValor() != null)
+                .mapToDouble(Pagamento::getValor)
                 .sum();
+
+        String turmaNome = (aluno.getTurma() != null) ? aluno.getTurma().getNome() : null;
 
         FichaAlunoDTO ficha = new FichaAlunoDTO(
                 aluno.getNome(),
-                aluno.getTurma(),
+                turmaNome,
                 resp.getName(),
                 pagamentos
         );
@@ -107,21 +121,28 @@ public class AlunoService {
         return alunos;
     }
 
-    public void excluirAluno(String id) {
-        // 1. Verificar se o aluno existe
+    public Aluno atualizarAluno(UUID id, Aluno dados) {
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado com ID: " + id));
+        aluno.setNome(dados.getNome());
+        aluno.setCpf(dados.getCpf());
+        aluno.setTurma(dados.getTurma());
+        aluno.setData_nascimento(dados.getData_nascimento());
+        aluno.setResponsavel(dados.getResponsavel());
+        return alunoRepository.save(aluno);
+    }
+
+    public void excluirAluno(UUID id) {
         if (!alunoRepository.existsById(id)) {
             throw new RuntimeException("Erro: Aluno não encontrado.");
         }
 
-        // 2. A TRAVA: Verificar se existem dívidas
-        boolean temDivida = pagamentoRepository.existsByAlunoIdAndPagoFalse(id);
+        boolean temDivida = pagamentoRepository.existsByAluno_IdAndPagoFalse(id);
 
         if (temDivida) {
             throw new RuntimeException("Não é possível excluir: Este aluno possui mensalidades pendentes!");
         }
 
-        // 3. Se passou pela trava, pode deletar
         alunoRepository.deleteById(id);
     }
-
 }
