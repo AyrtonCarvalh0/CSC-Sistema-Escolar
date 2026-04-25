@@ -16,12 +16,13 @@ CREATE TABLE professor (
 );
 
 CREATE TABLE turma (
-    id           UUID PRIMARY KEY,
-    nome         VARCHAR(255),
-    idade_max    INTEGER,
-    idade_min    INTEGER,
-    capacidade   INTEGER,
-    professor_id UUID REFERENCES professor(id)
+    id                  UUID PRIMARY KEY,
+    nome                VARCHAR(255),
+    idade_max           INTEGER,
+    idade_min           INTEGER,
+    capacidade          INTEGER,
+    valor_mensalidade   DOUBLE PRECISION,
+    professor_id        UUID REFERENCES professor(id)
 );
 
 CREATE TABLE aluno (
