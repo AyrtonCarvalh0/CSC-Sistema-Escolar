@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Configurações locais com dados sensíveis
+application-local.yml
+application-local.properties
+.env
+.env.local
+*.env
+
+# Logs
+*.log
+logs/
