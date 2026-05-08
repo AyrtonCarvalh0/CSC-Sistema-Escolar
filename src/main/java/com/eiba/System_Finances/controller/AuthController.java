@@ -16,7 +16,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -57,6 +62,41 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/cadastrar")
+    public ResponseEntity<?> cadastrar(@RequestBody CadastroUsuarioDTO dto) {
+        if (usuarioRepository.findByLogin(dto.login()).isPresent()) {
+            return ResponseEntity.badRequest().body("Login já existe");
+        }
+        String senhaCriptografada = passwordEncoder.encode(dto.senha());
+        Usuario novoUsuario = new Usuario(dto.login(), senhaCriptografada, dto.role());
+        usuarioRepository.save(novoUsuario);
+        return ResponseEntity.status(201).body("Usuário criado com sucesso");
+    }
+
+    @GetMapping("/usuarios")
+    public ResponseEntity<List<Map<String, Object>>> listarUsuarios() {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<Map<String, Object>> resultado = usuarios.stream()
+            .map(u -> {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", u.getId());
+                item.put("login", u.getLogin());
+                item.put("role", u.getRole());
+                return item;
+            })
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(resultado);
+    }
+
+    @DeleteMapping("/usuarios/{id}")
+    public ResponseEntity<?> deletarUsuario(@PathVariable UUID id) {
+        if (!usuarioRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        usuarioRepository.deleteById(id);
+        return ResponseEntity.ok("Usuário removido com sucesso");
+    }
+
     @PutMapping("/trocar-senha")
     public ResponseEntity<?> trocarSenha(
             @RequestBody TrocarSenhaDTO dto,
@@ -70,19 +110,30 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Senha atual incorreta");
         }
 
+        if (dto.novaSenha().length() < 6) {
+            return ResponseEntity.badRequest().body("A nova senha deve ter pelo menos 6 caracteres");
+        }
+
         usuario.setSenha(passwordEncoder.encode(dto.novaSenha()));
         usuarioRepository.save(usuario);
         return ResponseEntity.ok("Senha alterada com sucesso!");
     }
 
-    @PostMapping("/cadastrar")
-    public ResponseEntity<?> cadastrar(@RequestBody CadastroUsuarioDTO dto) {
-        if (usuarioRepository.findByLogin(dto.login()).isPresent()) {
-            return ResponseEntity.badRequest().body("Login já existe");
+    @PutMapping("/usuarios/{id}/resetar-senha")
+    public ResponseEntity<?> resetarSenha(
+            @PathVariable UUID id,
+            @RequestBody Map<String, String> body) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        String novaSenha = body.get("novaSenha");
+        if (novaSenha == null || novaSenha.length() < 6) {
+            return ResponseEntity.badRequest().body("A senha deve ter pelo menos 6 caracteres");
         }
-        String senhaCriptografada = passwordEncoder.encode(dto.senha());
-        Usuario novoUsuario = new Usuario(dto.login(), senhaCriptografada, dto.role());
-        usuarioRepository.save(novoUsuario);
-        return ResponseEntity.status(201).body("Usuário criado com sucesso");
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+        return ResponseEntity.ok("Senha resetada com sucesso!");
     }
 }

@@ -11,7 +11,11 @@
       "Bash(JAVA_HOME=\"/c/Program Files/Zulu/zulu-21\" ./mvnw compile -q)",
       "Bash(JAVA_HOME=\"/c/Program Files/Microsoft/jdk-21.0.6.7-hotspot\" ./mvnw compile -q)",
       "Read(//c/Program Files/**)",
-      "Bash(JAVA_HOME=\"C:/Program Files/Zulu/zulu-21\" ./mvnw compile -q)"
+      "Bash(JAVA_HOME=\"C:/Program Files/Zulu/zulu-21\" ./mvnw compile -q)",
+      "PowerShell(ls C:\\\\Users\\\\cayrt\\\\Downloads\\\\ | Where-Object { $_.Name -match \"csc|front\" })",
+      "PowerShell(Get-ChildItem C:\\\\Users\\\\cayrt\\\\OneDrive\\\\ -Recurse -Depth 3 -Directory | Where-Object { $_.Name -match \"csc|front|react\" } | Select-Object FullName)",
+      "PowerShell(java *)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\"; $env:JAVA_HOME = \"C:\\\\Program Files\\\\Zulu\\\\zulu-21\"; .\\\\mvnw compile -q 2>&1)"
     ]
   }
 }

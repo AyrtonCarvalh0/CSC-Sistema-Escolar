@@ -28,8 +28,12 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST,   "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST,   "/auth/cadastrar").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET,    "/auth/usuarios").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/auth/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,    "/auth/usuarios/**/resetar-senha").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,    "/auth/trocar-senha").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/aluno/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/turmas/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/professores/**").hasRole("ADMIN")
