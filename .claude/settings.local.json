@@ -20,7 +20,25 @@
       "Bash(pip install *)",
       "PowerShell(pip install *)",
       "PowerShell(python --version; python -m pip install git-filter-repo)",
-      "PowerShell(python3 --version 2>&1)"
+      "PowerShell(python3 --version 2>&1)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "PowerShell($env:JAVA_HOME = \"C:\\\\Program Files\\\\Zulu\\\\zulu-21\"; cd \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\"; .\\\\mvnw compile -q 2>&1)",
+      "PowerShell($env:JAVA_HOME = \"C:\\\\Program Files\\\\Zulu\\\\zulu-21\"; cd \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\"; .\\\\mvnw spring-boot:run 2>&1 | Select-Object -First 60)",
+      "PowerShell(Head 10 *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\vscode\\\\Sistema-CSC\\\\csc-frontend\"; Start-Process powershell -ArgumentList \"-NoExit\", \"-Command\", \"npm run dev\" -WindowStyle Normal; Write-Output \"Servidor iniciado em http://localhost:3000\")",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\vscode\\\\Sistema-CSC\\\\csc-frontend\\\\src\" -Recurse | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\\\\main\\\\java\\\\com\\\\eiba\\\\System_Finances\" -Recurse | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\\\\main\\\\resources\" -Recurse | ForEach-Object { $_.FullName })",
+      "Bash(JAVA_HOME=\"/c/Program Files/Zulu/zulu-21\" ./mvnw clean package -DskipTests -q)",
+      "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\" -Include \"*.java\",\"*.sql\",\"*.yml\",\"*.yaml\",\"*.xml\")",
+      "Bash(Select-String -Pattern \"atrícula\")",
+      "Bash(Select-Object -ExpandProperty Path)",
+      "Bash(Sort-Object -Unique)",
+      "PowerShell(Get-ChildItem -Recurse \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\" | Where-Object { $_.Name -match \"atrícula\" } | Select-Object FullName)",
+      "PowerShell(Remove-Item *)"
     ]
   }
 }

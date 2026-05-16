@@ -6,11 +6,13 @@ import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.entity.Responsavel;
 import com.eiba.System_Finances.entity.Turma;
 import com.eiba.System_Finances.repository.AlunoRepository;
+import com.eiba.System_Finances.repository.MatriculaRepository;
 import com.eiba.System_Finances.repository.PagamentoRepository;
 import com.eiba.System_Finances.repository.ResponsavelRepository;
 import com.eiba.System_Finances.repository.TurmaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +29,8 @@ public class AlunoService {
     private TurmaRepository turmaRepository;
     @Autowired
     private PagamentoRepository pagamentoRepository;
+    @Autowired
+    private MatriculaRepository matriculaRepository;
 
     public Aluno dadosAluno(UUID id, String nome, String cpf, LocalDate data_nascimento) {
         Aluno aluno = new Aluno();
@@ -132,17 +136,13 @@ public class AlunoService {
         return alunoRepository.save(aluno);
     }
 
+    @Transactional
     public void excluirAluno(UUID id) {
-        if (!alunoRepository.existsById(id)) {
-            throw new RuntimeException("Erro: Aluno não encontrado.");
-        }
+        Aluno aluno = alunoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
-        boolean temDivida = pagamentoRepository.existsByAluno_IdAndPagoFalse(id);
-
-        if (temDivida) {
-            throw new RuntimeException("Não é possível excluir: Este aluno possui mensalidades pendentes!");
-        }
-
+        pagamentoRepository.deleteByAluno(aluno);
+        matriculaRepository.deleteByAluno(aluno);
         alunoRepository.deleteById(id);
     }
 }

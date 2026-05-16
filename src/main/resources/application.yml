@@ -24,6 +24,12 @@ spring:
   config:
     import: optional:application-local.yml
 
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-binding-errors: never
+
 api:
   security:
     token:

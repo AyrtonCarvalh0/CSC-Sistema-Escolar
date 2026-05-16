@@ -20,6 +20,7 @@ public interface PagamentoRepository extends JpaRepository<Pagamento, UUID> {
     boolean existsByAluno_IdAndPagoFalse(UUID alunoId);
     List<Pagamento> findByMes(String mes);
     boolean existsByMes(String mes);
+    void deleteByAluno(Aluno aluno);
 
     @Query("SELECT p FROM Pagamento p WHERE p.mes = :mes AND p.pago = false AND p.aluno.turma.id = :turmaId")
     List<Pagamento> findDevedoresByMesAndTurma(@Param("mes") String mes, @Param("turmaId") UUID turmaId);

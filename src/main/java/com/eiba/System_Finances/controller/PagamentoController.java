@@ -4,9 +4,13 @@ import com.eiba.System_Finances.DTO.DevedorDTO;
 import com.eiba.System_Finances.DTO.ResumoCaixaDTO;
 import com.eiba.System_Finances.entity.Pagamento;
 import com.eiba.System_Finances.repository.PagamentoRepository;
+import com.eiba.System_Finances.service.AuditService;
 import com.eiba.System_Finances.service.PagamentoService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -18,11 +22,18 @@ import java.util.stream.Collectors;
 @RequestMapping("/pagamentos")
 public class PagamentoController {
 
-    @Autowired
-    private PagamentoService pagamentoService;
+    @Autowired private PagamentoService pagamentoService;
+    @Autowired private PagamentoRepository pagamentoRepository;
+    @Autowired private AuditService auditService;
 
-    @Autowired
-    private PagamentoRepository pagamentoRepository;
+    private String getUsuarioLogado(UserDetails user) {
+        return user != null ? user.getUsername() : "sistema";
+    }
+
+    private String getIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        return ip != null ? ip.split(",")[0] : request.getRemoteAddr();
+    }
 
     @PostMapping
     public Pagamento registrarPagamento(@RequestBody Pagamento pagamento) {
@@ -45,8 +56,18 @@ public class PagamentoController {
     }
 
     @PatchMapping("/{id}/confirmar")
-    public ResponseEntity<Pagamento> confirmarPagamento(@PathVariable UUID id) {
-        return ResponseEntity.ok(pagamentoService.darBaixaPagamento(id));
+    public ResponseEntity<Pagamento> confirmarPagamento(@PathVariable UUID id,
+                                                         @AuthenticationPrincipal UserDetails userDetails,
+                                                         HttpServletRequest request) {
+        Pagamento pagamento = pagamentoService.darBaixaPagamento(id);
+        auditService.registrar(
+            getUsuarioLogado(userDetails),
+            "CONFIRMAR_PAGAMENTO",
+            "PAGAMENTO",
+            "Pagamento confirmado: ID " + id,
+            getIp(request)
+        );
+        return ResponseEntity.ok(pagamento);
     }
 
     @GetMapping("/devedores/busca")
@@ -60,8 +81,17 @@ public class PagamentoController {
     }
 
     @PostMapping("/gerar-mes")
-    public ResponseEntity<String> gerarMes(@RequestParam String mes) {
+    public ResponseEntity<String> gerarMes(@RequestParam String mes,
+                                            @AuthenticationPrincipal UserDetails userDetails,
+                                            HttpServletRequest request) {
         String resultado = pagamentoService.gerarMensalidadesDoMes(mes);
+        auditService.registrar(
+            getUsuarioLogado(userDetails),
+            "GERAR_MENSALIDADES",
+            "PAGAMENTO",
+            "Mensalidades geradas para o mês: " + mes,
+            getIp(request)
+        );
         return ResponseEntity.ok(resultado);
     }
 

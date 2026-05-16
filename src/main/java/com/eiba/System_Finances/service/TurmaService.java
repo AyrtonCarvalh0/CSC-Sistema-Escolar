@@ -1,7 +1,7 @@
 package com.eiba.System_Finances.service;
 
 import com.eiba.System_Finances.entity.Aluno;
-import com.eiba.System_Finances.entity.Matrícula;
+import com.eiba.System_Finances.entity.Matricula;
 import com.eiba.System_Finances.entity.Professor;
 import com.eiba.System_Finances.entity.Turma;
 import com.eiba.System_Finances.repository.AlunoRepository;
@@ -51,15 +51,15 @@ public class TurmaService {
     }
 
     public List<Aluno> listarAlunosDaTurma(UUID turmaId) {
-        List<Matrícula> matriculas = matriculaRepository.findByTurma_Id(turmaId);
+        List<Matricula> matriculas = matriculaRepository.findByTurma_Id(turmaId);
         List<Aluno> alunos = new ArrayList<>();
-        for (Matrícula matricula : matriculas) {
+        for (Matricula matricula : matriculas) {
             alunos.add(matricula.getAluno());
         }
         return alunos;
     }
 
-    public List<Matrícula> listarMatriculasDaTurma(UUID turmaId) {
+    public List<Matricula> listarMatriculasDaTurma(UUID turmaId) {
         return matriculaRepository.findByTurma_Id(turmaId);
     }
 

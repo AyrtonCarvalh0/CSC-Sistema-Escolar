@@ -6,7 +6,9 @@ import com.eiba.System_Finances.DTO.LoginResponseDTO;
 import com.eiba.System_Finances.DTO.TrocarSenhaDTO;
 import com.eiba.System_Finances.entity.Usuario;
 import com.eiba.System_Finances.repository.UsuarioRepository;
+import com.eiba.System_Finances.service.AuditService;
 import com.eiba.System_Finances.service.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,44 +33,51 @@ public class AuthController {
     @Autowired UsuarioRepository usuarioRepository;
     @Autowired TokenService tokenService;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired AuditService auditService;
+
+    private String getIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        return ip != null ? ip.split(",")[0] : request.getRemoteAddr();
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
-        System.out.println("=== LOGIN ATTEMPT ===");
-        System.out.println("Login: " + dto.login());
-        System.out.println("Senha length: " + (dto.senha() != null ? dto.senha().length() : "NULL"));
-
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByLogin(dto.login());
-        if (usuarioOpt.isEmpty()) {
-            System.out.println("USUÁRIO NÃO ENCONTRADO NO BANCO");
-        } else {
-            Usuario u = usuarioOpt.get();
-            System.out.println("Usuário encontrado: " + u.getLogin());
-            System.out.println("Hash no banco: " + u.getSenha());
-            boolean matches = passwordEncoder.matches(dto.senha(), u.getSenha());
-            System.out.println("Senha bate: " + matches);
-        }
-
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto,
+                                                   HttpServletRequest request) {
         try {
             var usernamePassword = new UsernamePasswordAuthenticationToken(dto.login(), dto.senha());
             var auth = authenticationManager.authenticate(usernamePassword);
             var usuario = (Usuario) auth.getPrincipal();
             var token = tokenService.gerarToken(usuario);
+            auditService.registrar(
+                usuario.getLogin(),
+                "LOGIN",
+                "USUARIO",
+                "Login realizado com sucesso",
+                getIp(request)
+            );
             return ResponseEntity.ok(new LoginResponseDTO(token, usuario.getLogin(), usuario.getRole().name()));
         } catch (Exception e) {
-            System.out.println("ERRO NA AUTENTICAÇÃO: " + e.getMessage());
             return ResponseEntity.status(401).build();
         }
     }
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<?> cadastrar(@RequestBody CadastroUsuarioDTO dto) {
+    public ResponseEntity<?> cadastrar(@RequestBody CadastroUsuarioDTO dto,
+                                        @AuthenticationPrincipal UserDetails userDetails,
+                                        HttpServletRequest request) {
         if (usuarioRepository.findByLogin(dto.login()).isPresent()) {
             return ResponseEntity.badRequest().body("Login já existe");
         }
         String senhaCriptografada = passwordEncoder.encode(dto.senha());
         Usuario novoUsuario = new Usuario(dto.login(), senhaCriptografada, dto.role());
         usuarioRepository.save(novoUsuario);
+        auditService.registrar(
+            userDetails != null ? userDetails.getUsername() : "admin",
+            "CRIAR_USUARIO",
+            "USUARIO",
+            "Usuário criado: " + dto.login() + " | Role: " + dto.role(),
+            getIp(request)
+        );
         return ResponseEntity.status(201).body("Usuário criado com sucesso");
     }
 
@@ -89,18 +97,28 @@ public class AuthController {
     }
 
     @DeleteMapping("/usuarios/{id}")
-    public ResponseEntity<?> deletarUsuario(@PathVariable UUID id) {
+    public ResponseEntity<?> deletarUsuario(@PathVariable UUID id,
+                                             @AuthenticationPrincipal UserDetails userDetails,
+                                             HttpServletRequest request) {
         if (!usuarioRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
         usuarioRepository.deleteById(id);
+        auditService.registrar(
+            userDetails != null ? userDetails.getUsername() : "admin",
+            "DELETAR_USUARIO",
+            "USUARIO",
+            "Usuário removido: ID " + id,
+            getIp(request)
+        );
         return ResponseEntity.ok("Usuário removido com sucesso");
     }
 
     @PutMapping("/trocar-senha")
     public ResponseEntity<?> trocarSenha(
             @RequestBody TrocarSenhaDTO dto,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request) {
 
         Usuario usuario = usuarioRepository
             .findByLogin(userDetails.getUsername())
@@ -116,13 +134,22 @@ public class AuthController {
 
         usuario.setSenha(passwordEncoder.encode(dto.novaSenha()));
         usuarioRepository.save(usuario);
+        auditService.registrar(
+            userDetails.getUsername(),
+            "TROCAR_SENHA",
+            "USUARIO",
+            "Senha alterada",
+            getIp(request)
+        );
         return ResponseEntity.ok("Senha alterada com sucesso!");
     }
 
     @PutMapping("/usuarios/{id}/resetar-senha")
     public ResponseEntity<?> resetarSenha(
             @PathVariable UUID id,
-            @RequestBody Map<String, String> body) {
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request) {
 
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -134,6 +161,13 @@ public class AuthController {
 
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
+        auditService.registrar(
+            userDetails != null ? userDetails.getUsername() : "admin",
+            "RESETAR_SENHA",
+            "USUARIO",
+            "Senha resetada para usuário: ID " + id,
+            getIp(request)
+        );
         return ResponseEntity.ok("Senha resetada com sucesso!");
     }
 }
