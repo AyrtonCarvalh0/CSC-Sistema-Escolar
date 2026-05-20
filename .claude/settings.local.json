@@ -38,7 +38,9 @@
       "Bash(Select-Object -ExpandProperty Path)",
       "Bash(Sort-Object -Unique)",
       "PowerShell(Get-ChildItem -Recurse \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\" | Where-Object { $_.Name -match \"atrícula\" } | Select-Object FullName)",
-      "PowerShell(Remove-Item *)"
+      "PowerShell(Remove-Item *)",
+      "PowerShell(cmd /c \"dir /S /B \"\"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\vscode\\\\Sistema-CSC\\\\csc-frontend\\\\src\"\"\")",
+      "PowerShell(cmd /c \"dir \"\"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\vscode\\\\Sistema-CSC\\\\csc-frontend\\\\public\"\"\")"
     ]
   }
 }
