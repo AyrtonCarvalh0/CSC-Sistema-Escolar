@@ -16,7 +16,7 @@ spring:
     locations: classpath:db/migration
 
 cors:
-  allowed-origins: https://csc-sistema-front.vercel.app
+  allowed-origins: https://csc-sistema-front.vercel.app,https://csc-sistema-front-*.vercel.app
 
 api:
   security:
