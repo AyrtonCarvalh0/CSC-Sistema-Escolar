@@ -5,7 +5,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "matricula")
-public class Matrícula {
+public class Matricula {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -19,9 +19,9 @@ public class Matrícula {
     @JoinColumn(name = "turma_id")
     private Turma turma;
 
-    public Matrícula() {}
+    public Matricula() {}
 
-    public Matrícula(UUID id, Aluno aluno, Turma turma) {
+    public Matricula(UUID id, Aluno aluno, Turma turma) {
         this.id = id;
         this.aluno = aluno;
         this.turma = turma;

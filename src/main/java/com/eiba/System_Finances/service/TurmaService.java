@@ -1,7 +1,7 @@
 package com.eiba.System_Finances.service;
 
 import com.eiba.System_Finances.entity.Aluno;
-import com.eiba.System_Finances.entity.Matrícula;
+import com.eiba.System_Finances.entity.Matricula;
 import com.eiba.System_Finances.entity.Professor;
 import com.eiba.System_Finances.entity.Turma;
 import com.eiba.System_Finances.repository.AlunoRepository;
@@ -33,7 +33,7 @@ public class TurmaService {
     public Turma criarTurma(Turma turma) {
         if (turma.getProfessor() != null && turma.getProfessor().getId() != null) {
             Professor professor = professorRepository.findById(turma.getProfessor().getId())
-                    .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Professor nao encontrado"));
             turma.setProfessor(professor);
         }
         return turmaRepository.save(turma);
@@ -41,7 +41,7 @@ public class TurmaService {
 
     public Turma findById(UUID id) {
         if (!turmaRepository.existsById(id)) {
-            throw new RuntimeException("Id não encontrado");
+            throw new RuntimeException("Id nao encontrado");
         }
         return turmaRepository.findById(id).orElse(null);
     }
@@ -51,28 +51,28 @@ public class TurmaService {
     }
 
     public List<Aluno> listarAlunosDaTurma(UUID turmaId) {
-        List<Matrícula> matriculas = matriculaRepository.findByTurma_Id(turmaId);
+        List<Matricula> matriculas = matriculaRepository.findByTurma_Id(turmaId);
         List<Aluno> alunos = new ArrayList<>();
-        for (Matrícula matricula : matriculas) {
+        for (Matricula matricula : matriculas) {
             alunos.add(matricula.getAluno());
         }
         return alunos;
     }
 
-    public List<Matrícula> listarMatriculasDaTurma(UUID turmaId) {
+    public List<Matricula> listarMatriculasDaTurma(UUID turmaId) {
         return matriculaRepository.findByTurma_Id(turmaId);
     }
 
     public Turma atualizarTurma(Turma turma) {
         if (!turmaRepository.existsById(turma.getId())) {
-            throw new RuntimeException("Turma não encontrada");
+            throw new RuntimeException("Turma nao encontrada");
         }
         return turmaRepository.save(turma);
     }
 
     public void deletarTurma(UUID id) {
         if (!turmaRepository.existsById(id)) {
-            throw new RuntimeException("Turma não encontrada");
+            throw new RuntimeException("Turma nao encontrada");
         }
         turmaRepository.deleteById(id);
     }

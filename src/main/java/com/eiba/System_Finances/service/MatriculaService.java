@@ -1,7 +1,7 @@
 package com.eiba.System_Finances.service;
 
 import com.eiba.System_Finances.entity.Aluno;
-import com.eiba.System_Finances.entity.Matrícula;
+import com.eiba.System_Finances.entity.Matricula;
 import com.eiba.System_Finances.entity.Turma;
 import com.eiba.System_Finances.repository.AlunoRepository;
 import com.eiba.System_Finances.repository.MatriculaRepository;
@@ -24,28 +24,28 @@ public class MatriculaService {
     @Autowired
     private TurmaRepository turmaRepository;
 
-    public Matrícula matricularAluno(Matrícula matrícula) {
-        return matriculaRepository.save(matrícula);
+    public Matricula matricularAluno(Matricula matricula) {
+        return matriculaRepository.save(matricula);
     }
 
-    public Matrícula bucarMatricula(UUID id) {
+    public Matricula bucarMatricula(UUID id) {
         if (!matriculaRepository.existsById(id)) {
-            throw new RuntimeException("Id não encontrado");
+            throw new RuntimeException("Id nao encontrado");
         }
         return matriculaRepository.findById(id).orElse(null);
     }
 
-    public List<Matrícula> listarTodasMatriculas() {
+    public List<Matricula> listarTodasMatriculas() {
         return matriculaRepository.findAll();
     }
 
-    public List<Matrícula> listarMatriculasDaTurma(UUID turmaID) {
+    public List<Matricula> listarMatriculasDaTurma(UUID turmaID) {
         return matriculaRepository.findByTurma_Id(turmaID);
     }
 
     public void cancelarMatricula(UUID id) {
         if (!matriculaRepository.existsById(id)) {
-            throw new RuntimeException("Id não encontrado");
+            throw new RuntimeException("Id nao encontrado");
         }
         matriculaRepository.deleteById(id);
     }
