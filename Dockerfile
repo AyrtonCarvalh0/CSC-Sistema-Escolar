@@ -8,7 +8,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests -B
 
 # === Runtime ===
-FROM eclipse-temurin-21-jre
+FROM eclipse-temurin:21-jregit add Dockerfile
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
