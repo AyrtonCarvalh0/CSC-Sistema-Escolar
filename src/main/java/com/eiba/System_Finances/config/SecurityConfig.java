@@ -50,7 +50,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/professores/{id}").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/responsavel/{id}").hasRole("ADMIN")
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                .requestMatchers(HttpMethod.POST, "/portal/login").permitAll()
+                .requestMatchers("/portal/**").hasRole("ALUNO")
                 .anyRequest().authenticated()
+
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
