@@ -38,6 +38,9 @@ public class PortalAuthService {
         }
 
         // 4. Busca o aluno pelo CPF (remove formatação antes de buscar)
+        if (cpf == null || cpf.isBlank()) {
+            return null;
+        }
         String cpfLimpo = cpf.replaceAll("[^0-9]", "");
         Aluno aluno = alunoRepository.findByCpf(cpfLimpo).orElse(null);
         if (aluno == null) {
