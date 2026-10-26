@@ -1,0 +1,7 @@
+.git
+.gitignore
+*.md
+csc-frontend/
+docker-compose.yml
+.env
+application-local.yml

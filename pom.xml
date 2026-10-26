@@ -17,11 +17,10 @@
 
 	<properties>
 		<java.version>21</java.version>
+        <postgresql.version>42.7.4</postgresql.version>
 	</properties>
 
 	<dependencies>
-
-		<!-- PostgreSQL / JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -33,13 +32,11 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- 🌐 Web (ESSENCIAL para REST APIs) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- 🔧 DevTools (opcional, mas ajuda) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -47,14 +44,18 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- 🧪 Testes -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
-
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

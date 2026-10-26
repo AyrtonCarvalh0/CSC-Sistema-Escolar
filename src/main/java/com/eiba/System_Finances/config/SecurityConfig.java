@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/turmas/{id}").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/professores/{id}").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/responsavel/{id}").hasRole("ADMIN")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
