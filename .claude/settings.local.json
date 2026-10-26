@@ -40,7 +40,22 @@
       "PowerShell(Get-ChildItem -Recurse \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\" | Where-Object { $_.Name -match \"atrícula\" } | Select-Object FullName)",
       "PowerShell(Remove-Item *)",
       "PowerShell(cmd /c \"dir /S /B \"\"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\vscode\\\\Sistema-CSC\\\\csc-frontend\\\\src\"\"\")",
-      "PowerShell(cmd /c \"dir \"\"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\vscode\\\\Sistema-CSC\\\\csc-frontend\\\\public\"\"\")"
+      "PowerShell(cmd /c \"dir \"\"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\vscode\\\\Sistema-CSC\\\\csc-frontend\\\\public\"\"\")",
+      "Bash(dir \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\\\\main\\\\java\\\\com\\\\eiba\\\\System_Finances\\\\entity\\\\\" /B && dir \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\\\\main\\\\java\\\\com\\\\eiba\\\\System_Finances\\\\service\\\\\" /B)",
+      "Bash(dir \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\\\\main\\\\java\\\\com\\\\eiba\\\\System_Finances\\\\controller\\\\\" /B && dir \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\\\\src\\\\main\\\\java\\\\com\\\\eiba\\\\System_Finances\\\\repository\\\\\" /B)",
+      "Bash(git ls-tree *)",
+      "PowerShell($env:JAVA_HOME = \"C:\\\\Program Files\\\\Microsoft\\\\jdk-21.0.6.7-hotspot\"; cd \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\"; .\\\\mvnw.cmd compile 2>&1 | Select-Object -Last 60)",
+      "PowerShell(Get-ChildItem \"C:\\\\Program Files\" -Directory | Where-Object { $_.Name -match \"jdk|java|zulu|eclipse|adoptium\" -or $_.Name -match \"Temurin\" } | Select-Object FullName)",
+      "PowerShell($env:JAVA_HOME = \"C:\\\\Program Files\\\\Zulu\\\\zulu-21\"; cd \"C:\\\\Users\\\\cayrt\\\\OneDrive\\\\Documentos\\\\Sistema=Ane\\\\System-Finances\"; .\\\\mvnw.cmd compile 2>&1 | Select-Object -Last 60)",
+      "Bash(cat .railwayignore)",
+      "Bash(cat railway.json)",
+      "Bash(cat railway.toml)",
+      "PowerShell(git ls-tree *)",
+      "Bash(git fetch *)",
+      "Bash(dir EIBA *)",
+      "PowerShell(Get-ChildItem -Path \".\" -Depth 3 | Select-Object FullName, PSIsContainer | Where-Object PSIsContainer -eq $true)",
+      "Bash(git config *)",
+      "Bash(git submodule *)"
     ]
   }
 }

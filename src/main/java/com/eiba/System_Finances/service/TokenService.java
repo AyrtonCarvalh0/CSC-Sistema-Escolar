@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.eiba.System_Finances.entity.Aluno;
 import com.eiba.System_Finances.entity.Usuario;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,28 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
-                    .withIssuer("csc-api")
-                    .withSubject(usuario.getLogin())
-                    .withClaim("role", usuario.getRole().name())
-                    .withExpiresAt(Instant.now().plus(8, ChronoUnit.HOURS))
-                    .sign(algorithm);
+                .withIssuer("csc-api")
+                .withSubject(usuario.getLogin())
+                .withClaim("role", usuario.getRole().name())
+                .withExpiresAt(Instant.now().plus(8, ChronoUnit.HOURS))
+                .sign(algorithm);
         } catch (JWTCreationException e) {
             throw new RuntimeException("Erro ao gerar token", e);
+        }
+    }
+
+    public String gerarTokenAluno(Aluno aluno) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.create()
+                .withIssuer("csc-api")
+                .withSubject(aluno.getId().toString())
+                .withClaim("role", "ROLE_ALUNO")
+                .withClaim("tipo", "ALUNO")
+                .withExpiresAt(Instant.now().plus(8, ChronoUnit.HOURS))
+                .sign(algorithm);
+        } catch (JWTCreationException e) {
+            throw new RuntimeException("Erro ao carregar aluno", e);
         }
     }
 
@@ -39,6 +55,18 @@ public class TokenService {
                     .build()
                     .verify(token)
                     .getSubject();
+        } catch (JWTVerificationException e) {
+            return null;
+        }
+    }
+    public String extrairTipo(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                .withIssuer("csc-api")
+                .build()
+                .verify(token)
+                .getClaim("tipo").asString();
         } catch (JWTVerificationException e) {
             return null;
         }
