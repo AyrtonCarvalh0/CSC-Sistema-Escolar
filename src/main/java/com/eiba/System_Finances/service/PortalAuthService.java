@@ -16,6 +16,8 @@ public class PortalAuthService {
     @Autowired AlunoRepository alunoRepository;
     @Autowired TokenService tokenService;
 
+
+
     public String autenticar(String cpf, String senha) {
 
         // 1. Verifica se a senha tem o prefixo correto
@@ -32,21 +34,23 @@ public class PortalAuthService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
             dataNascimento = LocalDate.parse(parteData, formatter);
         } catch (DateTimeParseException e) {
-            return null; // data inválida
+            return null;
         }
 
-        // 4. Busca o aluno pelo CPF
-        Aluno aluno = alunoRepository.findByCpf(cpf).orElse(null);
+        // 4. Busca o aluno pelo CPF (remove formatação antes de buscar)
+        String cpfLimpo = cpf.replaceAll("[^0-9]", "");
+        Aluno aluno = alunoRepository.findByCpf(cpfLimpo).orElse(null);
         if (aluno == null) {
-            return null; // aluno não encontrado
+            return null;
         }
 
         // 5. Compara a data de nascimento
         if (!aluno.getData_nascimento().equals(dataNascimento)) {
-            return null; // data não bate
+            return null;
         }
 
         // 6. Tudo ok → gera o token
         return tokenService.gerarTokenAluno(aluno);
     }
+
 }
