@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.eiba.System_Finances.entity.Aluno;
 import com.eiba.System_Finances.entity.Usuario;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,11 +23,11 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
-                .withIssuer("csc-api")
-                .withSubject(usuario.getLogin())
-                .withClaim("role", usuario.getRole().name())
-                .withExpiresAt(Instant.now().plus(8, ChronoUnit.HOURS))
-                .sign(algorithm);
+                    .withIssuer("csc-api")
+                    .withSubject(usuario.getLogin())
+                    .withClaim("role", usuario.getRole().name())
+                    .withExpiresAt(Instant.now().plus(8, ChronoUnit.HOURS))
+                    .sign(algorithm);
         } catch (JWTCreationException e) {
             throw new RuntimeException("Erro ao gerar token", e);
         }
@@ -36,14 +37,14 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
-                .withIssuer("csc-api")
-                .withSubject(aluno.getId().toString())
-                .withClaim("role", "ROLE_ALUNO")
-                .withClaim("tipo", "ALUNO")
-                .withExpiresAt(Instant.now().plus(8, ChronoUnit.HOURS))
-                .sign(algorithm);
+                    .withIssuer("csc-api")
+                    .withSubject(aluno.getId().toString())
+                    .withClaim("tipo", "ALUNO")
+                    .withClaim("role", "ROLE_ALUNO")
+                    .withExpiresAt(Instant.now().plus(8, ChronoUnit.HOURS))
+                    .sign(algorithm);
         } catch (JWTCreationException e) {
-            throw new RuntimeException("Erro ao carregar aluno", e);
+            throw new RuntimeException("Erro ao gerar token do aluno", e);
         }
     }
 
@@ -59,14 +60,14 @@ public class TokenService {
             return null;
         }
     }
-    public String extrairTipo(String token) {
+
+    public DecodedJWT decodificarToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
-                .withIssuer("csc-api")
-                .build()
-                .verify(token)
-                .getClaim("tipo").asString();
+                    .withIssuer("csc-api")
+                    .build()
+                    .verify(token);
         } catch (JWTVerificationException e) {
             return null;
         }

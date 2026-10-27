@@ -10,92 +10,113 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PortalAuthServiceTest {
+class PortalAuthServiceTest {
 
-    @Mock
-    AlunoRepository alunoRepository;
+    private static final String CPF_VALIDO        = "12345678901";
+    private static final String SENHA_VALIDA       = "CSC@15032010";
+    private static final LocalDate DATA_NASCIMENTO = LocalDate.of(2010, 3, 15);
 
-    @Mock
-    TokenService tokenService;
+    @Mock AlunoRepository alunoRepository;
+    @Mock TokenService tokenService;
+    @InjectMocks PortalAuthService portalAuthService;
 
-    @InjectMocks
-    PortalAuthService portalAuthService;
+    // ── fixtures ─────────────────────────────────────────────────────────────
+
+    private Aluno alunoComDataCorreta() {
+        Aluno aluno = new Aluno();
+        aluno.setId(UUID.randomUUID());
+        aluno.setData_nascimento(DATA_NASCIMENTO);
+        return aluno;
+    }
+
+    // ── testes ────────────────────────────────────────────────────────────────
 
     @Test
-    void autenticar_senhaSemPrefixoCSC() {
-        // Arrange - nenhum mock necessário, o método retorna antes de consultar o banco
-
-        // Act
-        String resultado = portalAuthService.autenticar("00000000001", "senha-errada");
-
-        // Assert
-        assertNull(resultado);
+    void autenticar_senhaNula_retornaNull() {
+        assertNull(portalAuthService.autenticar(CPF_VALIDO, null));
+        verifyNoInteractions(alunoRepository);
     }
 
     @Test
-    void autenticar_dataInvalidaNaSenha() {
-        // Arrange - nenhum mock necessário
-
-        // Act
-        String resultado = portalAuthService.autenticar("00000000001", "CSC@99999999");
-
-        // Assert
-        assertNull(resultado);
+    void autenticar_senhaSemPrefixoCSC_retornaNull() {
+        assertNull(portalAuthService.autenticar(CPF_VALIDO, "15032010"));
+        verifyNoInteractions(alunoRepository);
     }
 
     @Test
-    void autenticar_cpfNaoEncontrado() {
-        // Arrange - mock retorna vazio para qualquer CPF
+    void autenticar_dataInvalidaNaSenha_retornaNull() {
+        // "CSC@" + data impossível → DateTimeParseException capturado internamente
+        assertNull(portalAuthService.autenticar(CPF_VALIDO, "CSC@99999999"));
+        verifyNoInteractions(alunoRepository);
+    }
+
+    @Test
+    void autenticar_cpfNulo_retornaNull() {
+        assertNull(portalAuthService.autenticar(null, SENHA_VALIDA));
+        verifyNoInteractions(alunoRepository);
+    }
+
+    @Test
+    void autenticar_cpfEmBranco_retornaNull() {
+        assertNull(portalAuthService.autenticar("   ", SENHA_VALIDA));
+        verifyNoInteractions(alunoRepository);
+    }
+
+    @Test
+    void autenticar_cpfNaoEncontrado_retornaNull() {
+        // Arrange
         when(alunoRepository.findByCpf(any())).thenReturn(Optional.empty());
 
-        // Act
-        String resultado = portalAuthService.autenticar("00000000099", "CSC@15032024");
-
-        // Assert
-        assertNull(resultado);
+        // Act & Assert
+        assertNull(portalAuthService.autenticar(CPF_VALIDO, SENHA_VALIDA));
     }
 
     @Test
-    void autenticar_dataNascimentoDivergente() {
-        // Arrange - aluno existe, mas nasceu em outra data
-        Aluno aluno = new Aluno();
-        aluno.setData_nascimento(LocalDate.of(2000, 1, 1)); // 01/01/2000
-
-        when(alunoRepository.findByCpf(any())).thenReturn(Optional.of(aluno));
-
-        // Act - senha diz 15/03/2024, mas o aluno nasceu em 01/01/2000
-        String resultado = portalAuthService.autenticar("00000000001", "CSC@15032024");
-
-        // Assert
-        assertNull(resultado);
-    }
-
-    @Test
-    void autenticar_credenciaisValidas() {
+    void autenticar_dataNascimentoDivergente_retornaNull() {
         // Arrange
         Aluno aluno = new Aluno();
-        aluno.setData_nascimento(LocalDate.of(2024, 3, 15));
-
+        aluno.setData_nascimento(LocalDate.of(2000, 1, 1)); // diferente da senha
         when(alunoRepository.findByCpf(any())).thenReturn(Optional.of(aluno));
-        when(tokenService.gerarTokenAluno(aluno)).thenReturn("token-gerado");
 
-        // Act
-        String resultado = portalAuthService.autenticar("00000000001", "CSC@15032024");
-
-        // Assert
-        assertNotNull(resultado);
-        assertEquals("token-gerado", resultado);
+        // Act & Assert
+        assertNull(portalAuthService.autenticar(CPF_VALIDO, SENHA_VALIDA));
+        verifyNoInteractions(tokenService);
     }
 
     @Test
-    void autenticar_cpfNulo(){
-        String resultado = portalAuthService.autenticar(null,  "CSC@15032024");
-        assertNull(resultado);
+    void autenticar_credenciaisValidas_retornaToken() {
+        // Arrange
+        Aluno aluno = alunoComDataCorreta();
+        when(alunoRepository.findByCpf(any())).thenReturn(Optional.of(aluno));
+        when(tokenService.gerarTokenAluno(aluno)).thenReturn("jwt-token-gerado");
+
+        // Act
+        String resultado = portalAuthService.autenticar(CPF_VALIDO, SENHA_VALIDA);
+
+        // Assert
+        assertAll(
+            () -> assertNotNull(resultado),
+            () -> assertEquals("jwt-token-gerado", resultado)
+        );
+        verify(tokenService, times(1)).gerarTokenAluno(aluno);
+    }
+
+    @Test
+    void autenticar_cpfComMascara_limpaEBuscaCorretamente() {
+        // Arrange — CPF formatado: deve remover pontos e traço antes de buscar
+        Aluno aluno = alunoComDataCorreta();
+        when(alunoRepository.findByCpf("12345678901")).thenReturn(Optional.of(aluno));
+        when(tokenService.gerarTokenAluno(aluno)).thenReturn("token");
+
+        // Act & Assert
+        assertNotNull(portalAuthService.autenticar("123.456.789-01", SENHA_VALIDA));
+        verify(alunoRepository).findByCpf("12345678901");
     }
 }
