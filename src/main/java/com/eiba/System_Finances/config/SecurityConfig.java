@@ -53,7 +53,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/portal/login").permitAll()
                 .requestMatchers("/portal/**").hasRole("ALUNO")
                 .anyRequest().authenticated()
-
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
