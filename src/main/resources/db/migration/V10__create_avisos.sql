@@ -4,6 +4,6 @@ CREATE TABLE aviso (
                        conteudo    TEXT,
                        criado_em   TIMESTAMP,
                        expira_em   TIMESTAMP,
-                       turma_id    BIGINT      REFERENCES turma(id),
-                       aluno_id    BIGINT      REFERENCES aluno(id)
+                       turma_id    UUID        REFERENCES turma(id),
+                       aluno_id    UUID        REFERENCES aluno(id)
 );
