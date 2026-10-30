@@ -8,5 +8,5 @@ public record AvisoDTO(
         String titulo,
         String conteudo,
         LocalDateTime criadoEm,
-        LocalDateTime expiraEm
-) {}
+        LocalDateTime expiraEm,
+        String s) {}

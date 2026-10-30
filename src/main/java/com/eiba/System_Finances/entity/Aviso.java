@@ -8,6 +8,8 @@ import java.util.UUID;
 @Table(name = "aviso")
 public class Aviso {
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -31,6 +33,10 @@ public class Aviso {
     @JoinColumn(name = "aluno_id")
     private Aluno aluno;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "criado_por_id")
+    private Usuario criadoPor;
+
     public Aviso() {}
 
     public UUID getId() { return id; }
@@ -53,4 +59,7 @@ public class Aviso {
 
     public Aluno getAluno() { return aluno; }
     public void setAluno(Aluno aluno) { this.aluno = aluno; }
+
+    public Usuario getCriadoPor() { return criadoPor; }
+    public void setCriadoPor(Usuario criadoPor) { this.criadoPor = criadoPor; }
 }

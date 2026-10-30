@@ -1,7 +1,9 @@
 package com.eiba.System_Finances.controller;
 
 import com.eiba.System_Finances.DTO.portal.*;
+import com.eiba.System_Finances.Enums.Role;
 import com.eiba.System_Finances.entity.Aluno;
+import com.eiba.System_Finances.entity.Usuario;
 import com.eiba.System_Finances.repository.AlunoRepository;
 import com.eiba.System_Finances.repository.AvisoRepository;
 import com.eiba.System_Finances.repository.BoletimRepository;
@@ -76,10 +78,21 @@ public class PortalController {
         List<AvisoDTO> avisos = avisoRepository
                 .findAvisosVisiveis(aluno.getId(), turmaId, LocalDateTime.now())
                 .stream()
-                .map(a -> new AvisoDTO(a.getId(), a.getTitulo(), a.getConteudo(), a.getCriadoEm(), a.getExpiraEm()))
+                .map(a -> new AvisoDTO(a.getId(),
+                    a.getTitulo(),
+                    a.getConteudo(),
+                    a.getCriadoEm(),
+                    a.getExpiraEm(),
+                    resolverAutor(a.getCriadoPor())
+                ))
                 .toList();
 
         return ResponseEntity.ok(avisos);
+    }
+
+    private String resolverAutor(Usuario usuario) {
+        if (usuario == null) return null;
+        return usuario.getRole() == Role.ADMIN ? "Diretoria" : "Secretaria";
     }
 
     // ─── BOLETIM ─────────────────────────────────────────────────────────────
